@@ -51,7 +51,7 @@ int main(void)
 	Object* Enemy = new Object;
 
 	// ** Enemy 초기화
-	Initialize(Enemy, (char*)"홋", 80, 10);
+	Initialize(Enemy, (char*)" 홋", 80, 10);
 
 	// ** 현재 시간으로 초기화.
 	ULONGLONG Time = GetTickCount64();
@@ -95,7 +95,7 @@ int main(void)
 			{
 				if (Bullet[i] != nullptr)
 				{
-					if ((Bullet[i]->TransInfo.Position.x + Bullet[i]->TransInfo.Scale.x) >= 120 || Collision(Bullet[i], Enemy))
+					if ((Bullet[i]->TransInfo.Position.x + Bullet[i]->TransInfo.Scale.x) >= 119 || Collision(Bullet[i], Enemy))
 					{
 						delete Bullet[i];
 						Bullet[i] = nullptr;
