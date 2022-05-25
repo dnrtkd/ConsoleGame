@@ -2,6 +2,17 @@
 
 static int SceneState = 0;
 
+static Player player;
+
+const char* bulletTexture = "*";
+
+static Object* bullets[128] = { nullptr };
+
+static int maxWidth = 150;
+static int maxHight = 50;
+
+static long delayTime = 0;
+
 // ** 초기화 함수 (디폴트 매개변수 : int _Value = 0)
 void Initialize(Object* _Object, char* _Texture, int _PosX = 0, int _PosY = 0);
 
@@ -30,18 +41,33 @@ bool Collision(const Object* _ObjectA, const Object* _ObjectB);
 // ** Bullet를 생성함.
 Object* CreateBullet(const int _x, const int _y);
 
+Object* Shoot(Object* obj);
+
 // ** 키입력 
-void UpdateInput(Object* _Object);
+void UpdateInput();
 
 void SceneManaer();
 
+void SetPosition(int _x, int _y, char* _str, int _Color);
 
+void Stage_ONE();
 
+void TitleScene();
 
-
+Object* PlayerShoot(Object* obj);
 
 
 // ** 함수 정의부
+
+void SetPosition(int _x, int _y, char* _str, int _Color)
+{
+	COORD Pos = { (SHORT)_x,(SHORT)_y }; // 콘솔 순서쌍
+
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Pos);//커서 위치 이동
+	SetTextColor(_Color);
+
+	printf_s("%s", _str);
+}
 
 
 void Initialize(Object* _Object, char* _Texture, int _PosX, int _PosY)
@@ -49,7 +75,7 @@ void Initialize(Object* _Object, char* _Texture, int _PosX, int _PosY)
 	// ** 3항 연상자. 
 	// ** _Name 의 값이 nullptr 이라면  SetName() 함수를 실행하고 아니라면,
 	// ** _Name의 값을 그대로 대입한다.
-	_Object->Info.Texture = (_Texture == nullptr) ? SetName() : _Texture;
+	_Object->Info.Texture [0]= (_Texture == nullptr) ? SetName() : _Texture;
 
 	// ** 이동속도 
 	_Object->Speed = 0;
@@ -62,7 +88,10 @@ void Initialize(Object* _Object, char* _Texture, int _PosX, int _PosY)
 
 	// ** 크기값
 	_Object->TransInfo.Scale = Vector2(
-		strlen(_Object->Info.Texture), 1);
+		strlen(_Object->Info.Texture[0]), 1);
+
+	_Object->Info.Color = 15;
+	_Object->TransInfo.Scale.y = 1;
 }
 
 char* SetName()
@@ -103,6 +132,17 @@ void OnDrawText(const char* _str, const int _x, const int _y, const int _Color)
 	SetCursorPosition(_x, _y);
 	SetTextColor(_Color);
 	cout << _str;
+}
+
+void OnDrawText(Object* obj)
+{
+	SetTextColor(obj->Info.Color);
+
+	for (int i = 0; i < obj->TransInfo.Scale.y; i++)
+	{
+		SetCursorPosition(obj->TransInfo.Position.x, obj->TransInfo.Position.y+i);
+		cout << obj->Info.Texture[i];
+	}
 }
 
 void OnDrawText(const int _Value, const int _x, const int _y, const int _Color)
@@ -153,23 +193,34 @@ Object* CreateBullet(const int _x, const int _y)
 	return _Object;
 }
 
-void UpdateInput(Object* _Object)
+void UpdateInput()
 {
 	// ** [상] 키를 입력받음.
 	if (GetAsyncKeyState(VK_UP))
-		_Object->TransInfo.Position.y -= 1;
+		player.obj.TransInfo.Position.y -= 1;
 
 	// ** [하] 키를 입력받음.
 	if (GetAsyncKeyState(VK_DOWN))
-		_Object->TransInfo.Position.y += 1;
+		player.obj.TransInfo.Position.y += 1;
 
 	// ** [좌] 키를 입력받음.
 	if (GetAsyncKeyState(VK_LEFT))
-		_Object->TransInfo.Position.x -= 1;
+		player.obj.TransInfo.Position.x -= 1;
 
 	// ** [우] 키를 입력받음.
 	if (GetAsyncKeyState(VK_RIGHT))
-		_Object->TransInfo.Position.x += 1;
+		player.obj.TransInfo.Position.x += 1;
+}
+//에너미나 플레이어를 인수로 받고 불렛을 반환
+Object* PlayerShoot(Object* obj)
+{
+	Object* bullet = new Object;
+
+
+	// ** 초기화 시 _x 와 _y 는 const 값으로 받아오면, 함수 내부에서 다른 값으로 변경 되지 않기때문에 안전하다.
+	Initialize(bullet, (char*)"*", obj->TransInfo.Position.x+ 8, obj->TransInfo.Position.y);
+
+	return bullet;
 }
 
 void SceneManaer()
@@ -177,10 +228,12 @@ void SceneManaer()
 	switch (SceneState)
 	{
 	case Scene::Title:
+		TitleScene();
 		break;
-	case Scene::Menu:
+	case Scene::Stage1:
+		Stage_ONE();
 		break;
-	case Scene::Battle:
+	case Scene::Stage2:
 		break;
 	case Scene::GameClear:
 		break;
@@ -189,5 +242,77 @@ void SceneManaer()
 
 void TitleScene()
 {
+	int Width = (120 / 2) - (strlen("     ,--. ,-----.  ,---.  ,--. ,--.,--.  ,--.      ,------. ,------.  ,----.    ") / 2);
+	int Height = 10;
+
+	SetPosition(Width, Height + 1, (char*)"     ,--. ,-----.  ,---.  ,--. ,--.,--.  ,--.      ,------. ,------.  ,----.    ", 1);
+	SetPosition(Width, Height + 2, (char*)"     |  |'  .-.  ''   .-' |  | |  ||  ,'.|  |      |  .--. '|  .--. ''  .-./    ", 2);
+	SetPosition(Width, Height + 3, (char*)",--. |  ||  | |  |`.  `-. |  | |  ||  |' '  |      |  '--'.'|  '--' ||  | .---. ", 3);
+	SetPosition(Width, Height + 4, (char*)"|  '-'  /'  '-'  '.-'    |'  '-'  '|  | `   |,----.|  |\  \ |  | --' '  '--'  | ", 4);
+	SetPosition(Width, Height + 5, (char*)" `-----'  `-----' `-----'  `-----' `--'  `--''----'`--' '--'`--'      `------'  ", 5);
+
+	Sleep(3000);
+
+	SceneState++;
+}
+
+void Stage_ONE()
+{
+	
+	// 계산 하는 부분
+
+	for (int i = 0; i < 128; i++)
+	{
+
+		if (bullets[i])
+		{
+			if (bullets[i]->TransInfo.Position.x + 3 > maxWidth)
+			{
+				delete  bullets[i];
+				bullets[i] = nullptr;
+			}
+			else
+			{
+				bullets[i]->TransInfo.Position.x += 2;
+			}
+		}
+	}
+
+	
+
+	// 입력 받는 부분
+	UpdateInput();
+
+	
+	
+	if (GetAsyncKeyState(VK_SPACE))
+	{
+		if (delayTime + player.delay < GetTickCount())
+		{
+			delayTime = GetTickCount();
+			for (int i = 0; i < 128; i++)
+			{
+				if (bullets[i] == nullptr)
+				{
+					bullets[i] = Shoot(&player.obj);
+					break;
+				}
+			}
+		}
+	}
+	// 콘솔 화면에 표시되는 부분
+
+	OnDrawText(&player.obj);
+
+	for (int i = 0; i < 128; i++)
+	{
+		if (bullets[i])
+		{
+			OnDrawText(bullets[i]);
+		}
+	}
+			
+	
+	
 
 }

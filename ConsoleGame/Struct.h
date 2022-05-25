@@ -22,19 +22,36 @@ struct Trasnsform
 
 struct Information
 {
-	char* Texture;
+	char* Texture[5];
 	int Color;
 	int Option;
 };
 
 struct Object
 {
-	char* Name;
 	int Speed;
 
 	Information Info;
 	Trasnsform TransInfo;
 };
+
+struct Enemy
+{
+	Object obj;
+	int hp;
+	int delay;
+};
+
+struct Player
+{
+	char* name;
+	Object obj;
+	int chance;
+	int damage;
+	int delay;
+	int level;
+};
+
 
 
 struct DrawTextInfo
@@ -46,7 +63,8 @@ struct DrawTextInfo
 enum Scene
 {
 	Title = 0,
-	Menu = 1,
-	Battle = 2,
+	//nu = 1,
+	Stage1 = 1,
+	Stage2= 2,
 	GameClear = 3
 };

@@ -16,14 +16,42 @@ int main(void)
 
 	system("title È«±æµ¿ Framework v0.6");
 
+
+	player.chance = 3;
+	player.damage = 5;
+	player.delay=100;
+	player.name = (char*)"È«±æµ¿";
+	player.obj.Info.Color = 10;
+	player.obj.Speed = 1;
+	player.obj.TransInfo.Position.x= 0;
+	player.obj.TransInfo.Position.y = 0;
+	player.obj.Info.Texture[0] = (char*)"¢¸¡á¡ë";
+	player.obj.Info.Texture[1] = (char*)"¢¸¡á¡ë";
+	player.obj.TransInfo.Scale.x = strlen("¢¸¡á¡ë");
+	player.obj.TransInfo.Scale.y = 2;
+	player.delay = 200; //0.1ÃÊ
+	player.level = 1;
 	long time=0;
 	
-	while (time+80 < GetTickCount())
-	{
-		time =GetTickCount();
+	player.obj.TransInfo.Position.x = 10;
+	player.obj.TransInfo.Position.y = 20;
 
-		system("cls");
-		SceneManaer();
+	for (int i = 0; i < 128; i++) //ºÒ·¿ ÃÊ±âÈ­
+	{
+
+		bullets[i] = nullptr;
+	}
+
+
+	while (1)
+	{
+		if (time + 80 < GetTickCount())
+		{
+			time = GetTickCount();
+
+			system("cls");
+			SceneManaer();
+		}
 	}
 	
 	
