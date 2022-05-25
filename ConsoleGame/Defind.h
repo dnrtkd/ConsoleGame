@@ -1,12 +1,15 @@
 #pragma once
 
+static int SceneState = 0;
+
 // ** 초기화 함수 (디폴트 매개변수 : int _Value = 0)
-void Initialize(Object* _Object, char* _Texture, int _PosX = 0, int _PosY = 0, int _PosZ = 0);
+void Initialize(Object* _Object, char* _Texture, int _PosX = 0, int _PosY = 0);
 
 // ** 이름을 셋팅하는 함수
 char* SetName();
 
 // ** 커서의 위치를 변경
+
 void SetCursorPosition(const int _x, const int _y);
 
 // ** Text의 색을 변경함.
@@ -30,7 +33,7 @@ Object* CreateBullet(const int _x, const int _y);
 // ** 키입력 
 void UpdateInput(Object* _Object);
 
-
+void SceneManaer();
 
 
 
@@ -41,7 +44,7 @@ void UpdateInput(Object* _Object);
 // ** 함수 정의부
 
 
-void Initialize(Object* _Object, char* _Texture, int _PosX, int _PosY, int _PosZ)
+void Initialize(Object* _Object, char* _Texture, int _PosX, int _PosY)
 {
 	// ** 3항 연상자. 
 	// ** _Name 의 값이 nullptr 이라면  SetName() 함수를 실행하고 아니라면,
@@ -52,14 +55,14 @@ void Initialize(Object* _Object, char* _Texture, int _PosX, int _PosY, int _PosZ
 	_Object->Speed = 0;
 
 	// ** 좌표값
-	_Object->TransInfo.Position = Vector3(_PosX, _PosY, _PosZ);
+	_Object->TransInfo.Position = Vector2(_PosX, _PosY);
 
 	// ** 회전값 (현재 사용되지 않음.)
-	_Object->TransInfo.Rotation = Vector3(0, 0, 0);
+	_Object->TransInfo.Rotation = Vector2(0, 0);
 
 	// ** 크기값
-	_Object->TransInfo.Scale = Vector3(
-		strlen(_Object->Info.Texture), 1, 0);
+	_Object->TransInfo.Scale = Vector2(
+		strlen(_Object->Info.Texture), 1);
 }
 
 char* SetName()
@@ -167,4 +170,24 @@ void UpdateInput(Object* _Object)
 	// ** [우] 키를 입력받음.
 	if (GetAsyncKeyState(VK_RIGHT))
 		_Object->TransInfo.Position.x += 1;
+}
+
+void SceneManaer()
+{
+	switch (SceneState)
+	{
+	case Scene::Title:
+		break;
+	case Scene::Menu:
+		break;
+	case Scene::Battle:
+		break;
+	case Scene::GameClear:
+		break;
+	}
+}
+
+void TitleScene()
+{
+
 }

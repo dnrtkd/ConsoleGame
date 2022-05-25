@@ -1,26 +1,23 @@
 #pragma once
 
-struct Vector3
+struct Vector2
 {
-	int x = 0, y = 0, z = 0;
+	int x = 0, y = 0;
 
 	// ** 기본 생성자
-	Vector3() {};
+	Vector2() {};
 
 	// ** 복사 생성자
-	Vector3(int _x, int _y)
-		: x(_x), y(_y), z(0) { };
+	Vector2(int _x, int _y)
+		: x(_x), y(_y){ };
 
-	// ** 복사 생성자
-	Vector3(int _x, int _y, int _z)
-		: x(_x), y(_y), z(_z) { };
 };
 
 struct Trasnsform
 {
-	Vector3 Position;
-	Vector3 Rotation;
-	Vector3 Scale;
+	Vector2 Position;
+	Vector2 Rotation;
+	Vector2 Scale;
 };
 
 struct Information
@@ -44,4 +41,12 @@ struct DrawTextInfo
 {
 	Information Info;
 	Trasnsform TransInfo;
+};
+
+enum Scene
+{
+	Title = 0,
+	Menu = 1,
+	Battle = 2,
+	GameClear = 3
 };
