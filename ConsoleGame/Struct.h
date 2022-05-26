@@ -38,6 +38,7 @@ struct Object
 struct Enemy
 {
 	Object obj;
+	int time;
 	int hp;
 	int delay;
 };
@@ -68,3 +69,5 @@ enum Scene
 	Stage2= 2,
 	GameClear = 3
 };
+
+typedef Object Bullet;

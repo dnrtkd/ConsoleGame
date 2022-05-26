@@ -4,14 +4,19 @@ static int SceneState = 0;
 
 static Player player;
 
-const char* bulletTexture = "*";
+static Bullet* BulletData[6];
 
-static Object* bullets[128] = { nullptr };
+static Bullet* bullets[128] = { nullptr };
+static Bullet* eBullets[128] = { nullptr };
+static Enemy* enemies[32] = { nullptr };
+static Enemy* enemy1;
 
 static int maxWidth = 150;
 static int maxHight = 50;
 
+//딜레이 계산할때 쓰는 함수
 static long delayTime = 0;
+static long enemyResporn = 0;
 
 // ** 초기화 함수 (디폴트 매개변수 : int _Value = 0)
 void Initialize(Object* _Object, char* _Texture, int _PosX = 0, int _PosY = 0);
@@ -39,9 +44,9 @@ void HideCursor(const bool _Visible);
 bool Collision(const Object* _ObjectA, const Object* _ObjectB);
 
 // ** Bullet를 생성함.
-Object* CreateBullet(const int _x, const int _y);
+Bullet* CreateBullet(Object* obj, int _x, int _Y);
 
-Object* Shoot(Object* obj);
+void PlayerShoot(Object* obj);
 
 // ** 키입력 
 void UpdateInput();
@@ -54,9 +59,11 @@ void Stage_ONE();
 
 void TitleScene();
 
-Object* PlayerShoot(Object* obj);
+Enemy* CreateEnemy(Enemy* src, int x, int y);
 
+void AppearEnemy(Enemy* src);
 
+void EnemyShoot(Enemy* enemy);
 // ** 함수 정의부
 
 void SetPosition(int _x, int _y, char* _str, int _Color)
@@ -173,54 +180,148 @@ bool Collision(const Object* _ObjectA, const Object* _ObjectB)
 	// ** Rect 충돌시 우측선은 항상 크다.
 	if ((_ObjectA->TransInfo.Position.x + _ObjectA->TransInfo.Scale.x) > _ObjectB->TransInfo.Position.x &&
 		(_ObjectB->TransInfo.Position.x + _ObjectB->TransInfo.Scale.x) > _ObjectA->TransInfo.Position.x &&
-		_ObjectA->TransInfo.Position.y == _ObjectB->TransInfo.Position.y)
+		_ObjectA->TransInfo.Position.y == _ObjectB->TransInfo.Position.y )
 	{
-		OnDrawText((char*)"충돌 입니다.", 55, 0, 14);
+		
 		return true;
 	}
 	else return false;
 		
 }
 
-Object* CreateBullet(const int _x, const int _y)
+Bullet* CreateBullet(Bullet* src,int _x,int _y)
 {
-	// ** Bullet를 생성 및 동적할당.
-	Object* _Object = new Object;
+	Bullet* bul = new Bullet;
 
-	// ** 초기화 시 _x 와 _y 는 const 값으로 받아오면, 함수 내부에서 다른 값으로 변경 되지 않기때문에 안전하다.
-	Initialize(_Object, (char*)"장풍!", _x + 2, _y);
+	bul->Info.Color = src->Info.Color;
+	bul->Info.Texture[0] = src->Info.Texture[0];
+	bul->Speed = src->Speed;
+	bul->TransInfo.Scale.x = src->TransInfo.Scale.x;
+	bul->TransInfo.Scale.y = src->TransInfo.Scale.y;
+	bul->TransInfo.Position.x = _x;
+	bul->TransInfo.Position.y = _y;
 
-	return _Object;
+	return bul;
 }
+
 
 void UpdateInput()
 {
 	// ** [상] 키를 입력받음.
 	if (GetAsyncKeyState(VK_UP))
-		player.obj.TransInfo.Position.y -= 1;
+		player.obj.TransInfo.Position.y -= player.obj.Speed;
 
 	// ** [하] 키를 입력받음.
 	if (GetAsyncKeyState(VK_DOWN))
-		player.obj.TransInfo.Position.y += 1;
+		player.obj.TransInfo.Position.y += player.obj.Speed;
 
 	// ** [좌] 키를 입력받음.
 	if (GetAsyncKeyState(VK_LEFT))
-		player.obj.TransInfo.Position.x -= 1;
+		player.obj.TransInfo.Position.x -= player.obj.Speed;
 
 	// ** [우] 키를 입력받음.
 	if (GetAsyncKeyState(VK_RIGHT))
-		player.obj.TransInfo.Position.x += 1;
+		player.obj.TransInfo.Position.x += player.obj.Speed;
 }
 //에너미나 플레이어를 인수로 받고 불렛을 반환
-Object* PlayerShoot(Object* obj)
+void PlayerShoot(Object* obj)
 {
-	Object* bullet = new Object;
+	if (delayTime + player.delay < GetTickCount())
+	{
+		delayTime = GetTickCount();
+		if (player.level == 1)
+		{
+			for (int i = 0; i < 128; i++)
+			{
+				if (bullets[i] == nullptr)
+				{
+					bullets[i] = CreateBullet(BulletData[0],
+						obj->TransInfo.Position.x+obj->TransInfo.Scale.x+3, obj->TransInfo.Position.y);
+					break;
+				}
+			}
+		}
+		else if (player.level == 2)
+		{
+			for (int i = 0; i < 128; i++)
+			{
+				if (bullets[i] == nullptr)
+				{
+					bullets[i] = CreateBullet(BulletData[0],
+						obj->TransInfo.Position.x + obj->TransInfo.Scale.x + 3, obj->TransInfo.Position.y);
+					break;
+				}
+			}
+			for (int i = 0; i < 128; i++)
+			{
+				if (bullets[i] == nullptr)
+				{
+					bullets[i] = CreateBullet(BulletData[0],
+						obj->TransInfo.Position.x + obj->TransInfo.Scale.x + 3, obj->TransInfo.Position.y+1);
+					break;
+				}
+			}
+		}
 
+		
+	}
+}
 
-	// ** 초기화 시 _x 와 _y 는 const 값으로 받아오면, 함수 내부에서 다른 값으로 변경 되지 않기때문에 안전하다.
-	Initialize(bullet, (char*)"*", obj->TransInfo.Position.x+ 8, obj->TransInfo.Position.y);
+Enemy* CreateEnemy(Enemy* src,int _x,int _y)
+{
+	Enemy* des = new Enemy;
+	des->delay = src->delay;
+	des->hp = src->hp;
+	des->obj.Info.Color = src->obj.Info.Color;
+	for (int i = 0; i < src->obj.TransInfo.Scale.y; i++)
+	{
+		des->obj.Info.Texture[i] = src->obj.Info.Texture[i];
+	}
+	des->obj.TransInfo.Scale.x = src->obj.TransInfo.Scale.x;
+	des->obj.TransInfo.Scale.y = src->obj.TransInfo.Scale.y;
+	des->obj.TransInfo.Position.x = _x;
+	des->obj.TransInfo.Position.y= _y;
+	des->time = 0;
+	return des;
+}
 
-	return bullet;
+void AppearEnemy(Enemy* src)
+{
+	srand(time(0));
+	int _x = rand() % 5 + 145;
+	int _y = rand() % 50;
+	if (enemyResporn +1000< GetTickCount())
+	{
+		enemyResporn = GetTickCount();
+		for (int i = 0; i < 32; i++)
+		{
+			if (enemies[i] == nullptr)
+			{
+				enemies[i] = CreateEnemy(src,_x,_y);
+				break;
+			}
+		}
+	}
+
+}
+
+void EnemyShoot(Enemy* enemy)
+{
+	if (enemy->time+ enemy->delay < GetTickCount())
+	{
+		enemy->time = GetTickCount();
+
+		for (int i = 0; i < 128; i++)
+		{
+			if (eBullets[i] ==nullptr)
+			{
+				eBullets[i] = CreateBullet(BulletData[1], enemy->obj.TransInfo.Position.x - 2,
+					enemy->obj.TransInfo.Position.y);
+				break;
+			}
+		}
+	}
+
 }
 
 void SceneManaer()
@@ -261,7 +362,7 @@ void Stage_ONE()
 	
 	// 계산 하는 부분
 
-	for (int i = 0; i < 128; i++)
+	for (int i = 0; i < 128; i++) //총알 이동
 	{
 
 		if (bullets[i])
@@ -273,12 +374,55 @@ void Stage_ONE()
 			}
 			else
 			{
-				bullets[i]->TransInfo.Position.x += 2;
+				bullets[i]->TransInfo.Position.x += 3;
+			}
+		}
+	}
+
+	for (int i = 0; i < 128; i++) //적 총알 이동
+	{
+
+		if (eBullets[i])
+		{
+			if (eBullets[i]->TransInfo.Position.x -3 < 0)
+			{
+				delete  eBullets[i];
+				eBullets[i] = nullptr;
+			}
+			else
+			{
+				eBullets[i]->TransInfo.Position.x -= 3;
+			}
+		}
+	}
+
+
+	for (size_t i = 0; i < 32; i++) //에너미 이동
+	{
+		if (enemies[i])
+		{
+			if (enemies[i]->obj.TransInfo.Position.x < 5)
+			{
+				delete enemies[i];
+				enemies[i] = nullptr;
+			}
+			else
+			{
+				enemies[i]->obj.TransInfo.Position.x -= 1;
 			}
 		}
 	}
 
 	
+	AppearEnemy(enemy1);
+
+	for (int i = 0; i < 32; i++)
+	{
+		if (enemies[i])
+		{
+			EnemyShoot(enemies[i]);
+		}
+	}
 
 	// 입력 받는 부분
 	UpdateInput();
@@ -287,20 +431,10 @@ void Stage_ONE()
 	
 	if (GetAsyncKeyState(VK_SPACE))
 	{
-		if (delayTime + player.delay < GetTickCount())
-		{
-			delayTime = GetTickCount();
-			for (int i = 0; i < 128; i++)
-			{
-				if (bullets[i] == nullptr)
-				{
-					bullets[i] = Shoot(&player.obj);
-					break;
-				}
-			}
-		}
+		PlayerShoot(&player.obj);
 	}
-	// 콘솔 화면에 표시되는 부분
+
+	 //*****************콘솔 화면에 표시되는 부분*********
 
 	OnDrawText(&player.obj);
 
@@ -312,7 +446,21 @@ void Stage_ONE()
 		}
 	}
 			
-	
+	for (size_t i = 0; i < 32; i++)
+	{
+		if (enemies[i])
+		{
+			OnDrawText(&enemies[i]->obj);
+		}
+	}
+
+	for (int i = 0; i < 128; i++)
+	{
+		if (eBullets[i])
+		{
+			OnDrawText(eBullets[i]);
+		}
+	}
 	
 
 }
