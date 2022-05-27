@@ -2,13 +2,13 @@
 
 struct Vector2
 {
-	int x = 0, y = 0;
+	float x; float y;
 
 	// ** 기본 생성자
 	Vector2() {};
 
 	// ** 복사 생성자
-	Vector2(int _x, int _y)
+	Vector2(float _x, float _y)
 		: x(_x), y(_y){ };
 
 };

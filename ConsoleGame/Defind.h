@@ -8,8 +8,10 @@ static Bullet* BulletData[6];
 
 static Bullet* bullets[128] = { nullptr };
 static Bullet* eBullets[128] = { nullptr };
+static Object* hitEffect[32] = { nullptr };
 static Enemy* enemies[32] = { nullptr };
 static Enemy* enemy1;
+static Object* hit;
 
 static int maxWidth = 150;
 static int maxHight = 50;
@@ -44,7 +46,7 @@ void HideCursor(const bool _Visible);
 bool Collision(const Object* _ObjectA, const Object* _ObjectB);
 
 // ** Bullet를 생성함.
-Bullet* CreateBullet(Object* obj, int _x, int _Y);
+Bullet* CreateBullet(Object* obj, float _x, float _Y);
 
 void PlayerShoot(Object* obj);
 
@@ -64,6 +66,16 @@ Enemy* CreateEnemy(Enemy* src, int x, int y);
 void AppearEnemy(Enemy* src);
 
 void EnemyShoot(Enemy* enemy);
+
+void EnemyHit();
+
+void Enemydied();
+
+void HitEffect(int _x, int _Y);
+
+Vector2 GetDirection(const Object* _ObjectA, const Object* _ObjectB);
+
+void move(Object* obj, Vector2 direction);
 // ** 함수 정의부
 
 void SetPosition(int _x, int _y, char* _str, int _Color)
@@ -180,7 +192,7 @@ bool Collision(const Object* _ObjectA, const Object* _ObjectB)
 	// ** Rect 충돌시 우측선은 항상 크다.
 	if ((_ObjectA->TransInfo.Position.x + _ObjectA->TransInfo.Scale.x) > _ObjectB->TransInfo.Position.x &&
 		(_ObjectB->TransInfo.Position.x + _ObjectB->TransInfo.Scale.x) > _ObjectA->TransInfo.Position.x &&
-		_ObjectA->TransInfo.Position.y == _ObjectB->TransInfo.Position.y )
+		(_ObjectA->TransInfo.Position.y == _ObjectB->TransInfo.Position.y || _ObjectA->TransInfo.Position.y+1 == _ObjectB->TransInfo.Position.y) )
 	{
 		
 		return true;
@@ -189,7 +201,7 @@ bool Collision(const Object* _ObjectA, const Object* _ObjectB)
 		
 }
 
-Bullet* CreateBullet(Bullet* src,int _x,int _y)
+Bullet* CreateBullet(Bullet* src,float _x,float _y)
 {
 	Bullet* bul = new Bullet;
 
@@ -200,7 +212,8 @@ Bullet* CreateBullet(Bullet* src,int _x,int _y)
 	bul->TransInfo.Scale.y = src->TransInfo.Scale.y;
 	bul->TransInfo.Position.x = _x;
 	bul->TransInfo.Position.y = _y;
-
+	bul->TransInfo.Rotation.x = src->TransInfo.Rotation.x;
+	bul->TransInfo.Rotation.y = src->TransInfo.Rotation.y;
 	return bul;
 }
 
@@ -279,8 +292,11 @@ Enemy* CreateEnemy(Enemy* src,int _x,int _y)
 	}
 	des->obj.TransInfo.Scale.x = src->obj.TransInfo.Scale.x;
 	des->obj.TransInfo.Scale.y = src->obj.TransInfo.Scale.y;
+	des->obj.TransInfo.Rotation.x = src->obj.TransInfo.Rotation.x;
+	des->obj.TransInfo.Rotation.y = src->obj.TransInfo.Rotation.y;
 	des->obj.TransInfo.Position.x = _x;
 	des->obj.TransInfo.Position.y= _y;
+	des->obj.Speed = src->obj.Speed;
 	des->time = 0;
 	return des;
 }
@@ -289,7 +305,7 @@ void AppearEnemy(Enemy* src)
 {
 	srand(time(0));
 	int _x = rand() % 5 + 145;
-	int _y = rand() % 50;
+	int _y = rand() % 30;
 	if (enemyResporn +1000< GetTickCount())
 	{
 		enemyResporn = GetTickCount();
@@ -322,6 +338,68 @@ void EnemyShoot(Enemy* enemy)
 		}
 	}
 
+}
+
+Vector2 GetDirection(const Object* _ObjectA, const Object* _ObjectB)
+{
+	float x = _ObjectA->TransInfo.Position.x - _ObjectB->TransInfo.Position.x;
+	float y = _ObjectA->TransInfo.Position.y - _ObjectB->TransInfo.Position.y;
+
+	float Distance = sqrt((x * x) + (y * y));
+
+	return Vector2(x / Distance, y / Distance);
+}
+
+void EnemyHit()
+{
+	for (int i = 0; i < 32; i++)
+	{
+		if (enemies[i])
+		{
+			for (int j = 0; j < 128; j++)
+			{
+				if (bullets[j])
+				{
+					if (Collision(&enemies[i]->obj, bullets[j]))
+					{
+						enemies[i]->hp -= 10;
+						HitEffect(enemies[i]->obj.TransInfo.Position.x - 3, enemies[i]->obj.TransInfo.Position.y);
+						
+						delete bullets[j];
+						bullets[j] = nullptr;
+					}
+				}
+			}
+		}
+	}
+}
+
+void HitEffect(int _x,int _y)
+{
+	for (size_t i = 0; i < 32; i++)
+	{
+		if (hitEffect[i] == nullptr)
+		{
+			hitEffect[i] = CreateBullet(hit, _x, _y);
+
+		}
+
+	}
+}
+
+void Enemydied()
+{
+	for (int i = 0; i < 32; i++)
+	{
+		if (enemies[i])
+		{
+			if (enemies[i]->hp <= 0)
+			{
+				delete enemies[i];
+				enemies[i] = nullptr;
+			}
+		}
+	}
 }
 
 void SceneManaer()
@@ -357,6 +435,12 @@ void TitleScene()
 	SceneState++;
 }
 
+void move(Object* obj,Vector2 direction)
+{
+	obj->TransInfo.Position.x += direction.x * obj->Speed;
+	obj->TransInfo.Position.y += direction.y * obj->Speed;
+}
+
 void Stage_ONE()
 {
 	
@@ -374,7 +458,7 @@ void Stage_ONE()
 			}
 			else
 			{
-				bullets[i]->TransInfo.Position.x += 3;
+				move(bullets[i]);
 			}
 		}
 	}
@@ -391,7 +475,7 @@ void Stage_ONE()
 			}
 			else
 			{
-				eBullets[i]->TransInfo.Position.x -= 3;
+				move(eBullets[i],GetDirection(&player.obj,eBullets[i]));
 			}
 		}
 	}
@@ -408,10 +492,13 @@ void Stage_ONE()
 			}
 			else
 			{
-				enemies[i]->obj.TransInfo.Position.x -= 1;
+				move(&enemies[i]->obj);
 			}
 		}
 	}
+
+	EnemyHit();
+	Enemydied();
 
 	
 	AppearEnemy(enemy1);
@@ -459,6 +546,14 @@ void Stage_ONE()
 		if (eBullets[i])
 		{
 			OnDrawText(eBullets[i]);
+		}
+	}
+
+	for (int i = 0; i < 32; i++)
+	{
+		if (hitEffect[i])
+		{
+			OnDrawText(hitEffect[i]);
 		}
 	}
 	
