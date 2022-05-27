@@ -458,7 +458,7 @@ void Stage_ONE()
 			}
 			else
 			{
-				move(bullets[i]);
+				move(bullets[i], bullets[i]->TransInfo.Rotation);
 			}
 		}
 	}
@@ -492,7 +492,7 @@ void Stage_ONE()
 			}
 			else
 			{
-				move(&enemies[i]->obj);
+				move(&enemies[i]->obj,enemies[i]->obj.TransInfo.Rotation);
 			}
 		}
 	}

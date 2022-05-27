@@ -48,6 +48,7 @@ int main(void)
 	enemy1->obj.TransInfo.Rotation.x = -1;
 	enemy1->obj.TransInfo.Rotation.y = 0;
 	enemy1->time = 0;
+	
 
 	BulletData[0] = new Bullet;
 	BulletData[0]->Info.Color = 3;

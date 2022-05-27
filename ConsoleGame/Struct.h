@@ -39,6 +39,7 @@ struct Enemy
 {
 	Object obj;
 	int time;
+	int hitTime;
 	int hp;
 	int delay;
 };
