@@ -35,6 +35,12 @@ struct Object
 	Trasnsform TransInfo;
 };
 
+struct Effect
+{
+	int time;
+	Object obj;
+};
+
 struct Enemy
 {
 	Object obj;

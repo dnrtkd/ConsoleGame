@@ -19,7 +19,7 @@ int main(void)
 
 	player.chance = 3;
 	player.damage = 5;
-	player.delay=100;
+	player.delay=300;
 	player.name = (char*)"È«±æµ¿";
 	player.obj.Info.Color = 10;
 	player.obj.Speed = 3;
@@ -30,7 +30,7 @@ int main(void)
 	player.obj.TransInfo.Scale.x = strlen("¢¸¡á¡ë");
 	player.obj.TransInfo.Scale.y = 2;
 	player.delay = 100; //0.1ÃÊ
-	player.level = 2;
+	player.level = 4;
 	long time=0;
 	
 	player.obj.TransInfo.Position.x = 10;
@@ -38,8 +38,8 @@ int main(void)
 
 	enemy1 = new Enemy;
 	enemy1->delay = 2000;
-	enemy1->hp = 50;
-	enemy1->obj.Speed = 2;
+	enemy1->hp = 15;
+	enemy1->obj.Speed = 1;
 	enemy1->obj.Info.Color = 5;
 	enemy1->obj.Info.Texture[0] = (char*)"¡Û.¢º";
 	enemy1->obj.Info.Texture[1] = (char*)"¡Û.¢º";
@@ -68,12 +68,22 @@ int main(void)
 	BulletData[1]->TransInfo.Rotation.x = -1;
 	BulletData[1]->TransInfo.Rotation.y = 0;
 
-	hit = new Object;
-	hit->Info.Color = 12;
-	hit->Info.Texture[0] = (char *)"¢Ý";
-	hit->Speed = 1;
-	hit->TransInfo.Scale.x = strlen("¢Ý");
-	hit->TransInfo.Scale.y = 1.0f;
+	BulletData[2] = new Bullet;
+	BulletData[2]->Info.Color = 7;
+	BulletData[2]->Info.Texture[0] = (char*)"¡Û";
+	BulletData[2]->Speed = 3;
+	BulletData[2]->TransInfo.Scale.x = strlen("¡Û");
+	BulletData[2]->TransInfo.Scale.y = 1;
+	BulletData[2]->TransInfo.Rotation.x = 1;
+	BulletData[2]->TransInfo.Rotation.y = 0;
+
+	hit = new Effect;
+	hit->obj.Info.Color = 12;
+	hit->obj.Info.Texture[0] = (char *)"¢Í";
+	hit->obj.Speed = 1;
+	hit->obj.TransInfo.Scale.x = strlen("¢Í");
+	hit->obj.TransInfo.Scale.y = 1.0f;
+	hit->time = 0;
 	for (int i = 0; i < 128; i++) //ºÒ·¿ ÃÊ±âÈ­
 	{
 

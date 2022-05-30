@@ -8,13 +8,13 @@ static Bullet* BulletData[6];
 
 static Bullet* bullets[128] = { nullptr };
 static Bullet* eBullets[128] = { nullptr };
-static Object* hitEffect[32] = { nullptr };
+static Effect* hitEffect[32] = { nullptr };
 static Enemy* enemies[32] = { nullptr };
 static Enemy* enemy1;
-static Object* hit;
+static Effect* hit;
 
 static int maxWidth = 150;
-static int maxHight = 50;
+static int maxHight = 30;
 
 //딜레이 계산할때 쓰는 함수
 static long delayTime = 0;
@@ -72,6 +72,10 @@ void EnemyHit();
 void Enemydied();
 
 void HitEffect(int _x, int _Y);
+
+float GetDistance(const Object* _ObjectA, const Object* _ObjectB);
+
+Effect* createEffect(Effect* src, float _x, float _y);
 
 Vector2 GetDirection(const Object* _ObjectA, const Object* _ObjectB);
 
@@ -217,6 +221,41 @@ Bullet* CreateBullet(Bullet* src,float _x,float _y)
 	return bul;
 }
 
+Bullet* CreateBullet(Bullet* src, float _x, float _y,Vector2 dir)
+{
+	Bullet* bul = new Bullet;
+
+	bul->Info.Color = src->Info.Color;
+	bul->Info.Texture[0] = src->Info.Texture[0];
+	bul->Speed = src->Speed;
+	bul->TransInfo.Scale.x = src->TransInfo.Scale.x;
+	bul->TransInfo.Scale.y = src->TransInfo.Scale.y;
+	bul->TransInfo.Position.x = _x;
+	bul->TransInfo.Position.y = _y;
+	bul->TransInfo.Rotation.x = dir.x;
+	bul->TransInfo.Rotation.y = dir.y;
+	return bul;
+}
+
+
+
+Effect* createEffect(Effect* src,float _x,float _y)
+{
+	Effect* eff = new Effect;
+
+	eff->obj.Info.Color = src->obj.Info.Color;
+	eff->obj.Info.Texture[0] = src->obj.Info.Texture[0];
+	eff->obj.Speed = src->obj.Speed;
+	eff->obj.TransInfo.Scale.x = src->obj.TransInfo.Scale.x;
+	eff->obj.TransInfo.Scale.y = src->obj.TransInfo.Scale.y;
+	eff->obj.TransInfo.Position.x = _x;
+	eff->obj.TransInfo.Position.y = _y;
+	eff->obj.TransInfo.Rotation.x = src->obj.TransInfo.Rotation.x;
+	eff->obj.TransInfo.Rotation.y = src->obj.TransInfo.Rotation.y;
+	eff->time = GetTickCount();
+	return eff;
+}
+
 
 void UpdateInput()
 {
@@ -271,6 +310,78 @@ void PlayerShoot(Object* obj)
 				{
 					bullets[i] = CreateBullet(BulletData[0],
 						obj->TransInfo.Position.x + obj->TransInfo.Scale.x + 3, obj->TransInfo.Position.y+1);
+					break;
+				}
+			}
+		}
+		else if (player.level == 3)
+		{
+			for (int i = 0; i < 128; i++)
+			{
+				if (bullets[i] == nullptr)
+				{
+					bullets[i] = CreateBullet(BulletData[0],
+						obj->TransInfo.Position.x + obj->TransInfo.Scale.x + 3, obj->TransInfo.Position.y);
+					break;
+				}
+			}
+			for (int i = 0; i < 128; i++)
+			{
+				if (bullets[i] == nullptr)
+				{
+					bullets[i] = CreateBullet(BulletData[0],
+						obj->TransInfo.Position.x + obj->TransInfo.Scale.x + 3, obj->TransInfo.Position.y + 1);
+					break;
+				}
+			}
+			for (int i = 0; i < 128; i++)
+			{
+				if (bullets[i] == nullptr)
+				{
+					bullets[i] = CreateBullet(BulletData[0],
+						obj->TransInfo.Position.x + obj->TransInfo.Scale.x + 3, 
+						obj->TransInfo.Position.y + 1,Vector2(1,0.5));
+					break;
+				}
+			}
+		}
+		else if (player.level == 4)
+		{
+			for (int i = 0; i < 128; i++)
+			{
+				if (bullets[i] == nullptr)
+				{
+					bullets[i] = CreateBullet(BulletData[0],
+						obj->TransInfo.Position.x + obj->TransInfo.Scale.x + 3, obj->TransInfo.Position.y);
+					break;
+				}
+			}
+			for (int i = 0; i < 128; i++)
+			{
+				if (bullets[i] == nullptr)
+				{
+					bullets[i] = CreateBullet(BulletData[0],
+						obj->TransInfo.Position.x + obj->TransInfo.Scale.x + 3, obj->TransInfo.Position.y + 1);
+					break;
+				}
+			}
+			for (int i = 0; i < 128; i++)
+			{
+				if (bullets[i] == nullptr)
+				{
+					bullets[i] = CreateBullet(BulletData[2],
+						obj->TransInfo.Position.x + obj->TransInfo.Scale.x + 3,
+						obj->TransInfo.Position.y -2);
+					break;
+				}
+			}
+			for (int i = 0; i < 128; i++)
+			{
+				if (bullets[i] == nullptr)
+				{
+					bullets[i] = CreateBullet(BulletData[2],
+						obj->TransInfo.Position.x + obj->TransInfo.Scale.x + 3,
+						obj->TransInfo.Position.y + 2);
 					break;
 				}
 			}
@@ -333,6 +444,7 @@ void EnemyShoot(Enemy* enemy)
 			{
 				eBullets[i] = CreateBullet(BulletData[1], enemy->obj.TransInfo.Position.x - 2,
 					enemy->obj.TransInfo.Position.y);
+				eBullets[i]->TransInfo.Rotation = GetDirection(&player.obj, eBullets[i]);
 				break;
 			}
 		}
@@ -350,6 +462,16 @@ Vector2 GetDirection(const Object* _ObjectA, const Object* _ObjectB)
 	return Vector2(x / Distance, y / Distance);
 }
 
+float GetDistance(const Object* _ObjectA, const Object* _ObjectB)
+{
+	float x = _ObjectA->TransInfo.Position.x - _ObjectB->TransInfo.Position.x;
+	float y = _ObjectA->TransInfo.Position.y - _ObjectB->TransInfo.Position.y;
+
+	float Distance = sqrt((x * x) + (y * y));
+
+	return Distance;
+}
+
 void EnemyHit()
 {
 	for (int i = 0; i < 32; i++)
@@ -363,7 +485,7 @@ void EnemyHit()
 					if (Collision(&enemies[i]->obj, bullets[j]))
 					{
 						enemies[i]->hp -= 10;
-						HitEffect(enemies[i]->obj.TransInfo.Position.x - 3, enemies[i]->obj.TransInfo.Position.y);
+						HitEffect(bullets[j]->TransInfo.Position.x - 3, bullets[j]->TransInfo.Position.y);
 						
 						delete bullets[j];
 						bullets[j] = nullptr;
@@ -380,12 +502,12 @@ void HitEffect(int _x,int _y)
 	{
 		if (hitEffect[i] == nullptr)
 		{
-			hitEffect[i] = CreateBullet(hit, _x, _y);
-
+			hitEffect[i] = createEffect(hit, _x, _y);
+			break;
 		}
-
 	}
 }
+
 
 void Enemydied()
 {
@@ -421,7 +543,7 @@ void SceneManaer()
 
 void TitleScene()
 {
-	int Width = (120 / 2) - (strlen("     ,--. ,-----.  ,---.  ,--. ,--.,--.  ,--.      ,------. ,------.  ,----.    ") / 2);
+	int Width = (150 / 2) - (strlen("     ,--. ,-----.  ,---.  ,--. ,--.,--.  ,--.      ,------. ,------.  ,----.    ") / 2);
 	int Height = 10;
 
 	SetPosition(Width, Height + 1, (char*)"     ,--. ,-----.  ,---.  ,--. ,--.,--.  ,--.      ,------. ,------.  ,----.    ", 1);
@@ -448,10 +570,42 @@ void Stage_ONE()
 
 	for (int i = 0; i < 128; i++) //총알 이동
 	{
-
-		if (bullets[i])
+		if (bullets[i] && bullets[i]->Info.Color == 7)
 		{
-			if (bullets[i]->TransInfo.Position.x + 3 > maxWidth)
+			if (bullets[i]->TransInfo.Position.x + 3 > maxWidth ||
+				bullets[i]->TransInfo.Position.y - 2 < 0 ||
+				bullets[i]->TransInfo.Position.y + 2 > maxHight ||
+				bullets[i]->TransInfo.Position.x - 2 <0 )
+			{
+				delete  bullets[i];
+				bullets[i] = nullptr;
+			}
+			else
+			{
+				float closer = 28;
+				int index = 0;
+				for (size_t j = 0; j < 32; j++)
+				{
+					if (enemies[j])
+					{
+						float dis = GetDistance(&enemies[j]->obj,bullets[i]);
+						if (closer < dis)
+						{
+							closer = dis;
+							index = j;
+						}
+
+					}
+				}
+				move(bullets[i], GetDirection(&enemies[index]->obj,bullets[i]));
+			}
+			
+		}
+		else if (bullets[i])
+		{
+			if (bullets[i]->TransInfo.Position.x + 3 > maxWidth || 
+				bullets[i]->TransInfo.Position.y-2<0 ||
+				bullets[i]->TransInfo.Position.y+2>maxHight)
 			{
 				delete  bullets[i];
 				bullets[i] = nullptr;
@@ -468,14 +622,16 @@ void Stage_ONE()
 
 		if (eBullets[i])
 		{
-			if (eBullets[i]->TransInfo.Position.x -3 < 0)
+			if (eBullets[i]->TransInfo.Position.x -3 < 0 ||
+				eBullets[i]->TransInfo.Position.y - 2 < 0 ||
+				eBullets[i]->TransInfo.Position.y+2>maxHight)
 			{
 				delete  eBullets[i];
 				eBullets[i] = nullptr;
 			}
 			else
 			{
-				move(eBullets[i],GetDirection(&player.obj,eBullets[i]));
+				move(eBullets[i],eBullets[i]->TransInfo.Rotation);
 			}
 		}
 	}
@@ -496,6 +652,21 @@ void Stage_ONE()
 			}
 		}
 	}
+
+	for (size_t i = 0; i < 32; i++) //이펙트 계산
+	{
+		
+		if (hitEffect[i])
+		{
+			if (hitEffect[i]->time + 300 < GetTickCount())
+			{
+				delete hitEffect[i];
+				hitEffect[i] = nullptr;
+			}
+		}
+	}
+
+	
 
 	EnemyHit();
 	Enemydied();
@@ -553,7 +724,7 @@ void Stage_ONE()
 	{
 		if (hitEffect[i])
 		{
-			OnDrawText(hitEffect[i]);
+			OnDrawText(&hitEffect[i]->obj);
 		}
 	}
 	
