@@ -38,12 +38,12 @@ int main(void)
 
 	enemy1 = new Enemy;
 	enemy1->delay = 2000;
-	enemy1->hp = 15;
+	enemy1->hp = 50;
 	enemy1->obj.Speed = 1;
 	enemy1->obj.Info.Color = 5;
-	enemy1->obj.Info.Texture[0] = (char*)"¡Û.¢º";
-	enemy1->obj.Info.Texture[1] = (char*)"¡Û.¢º";
-	enemy1->obj.TransInfo.Scale.x = strlen("¡Û.¢º");
+	enemy1->obj.Info.Texture[0] = (char*)"¡Û¡à¢º";
+	enemy1->obj.Info.Texture[1] = (char*)" ¡å¢º ";
+	enemy1->obj.TransInfo.Scale.x = strlen("¡Û¡à¢º");
 	enemy1->obj.TransInfo.Scale.y = 2;
 	enemy1->obj.TransInfo.Rotation.x = -1;
 	enemy1->obj.TransInfo.Rotation.y = 0;
@@ -70,9 +70,9 @@ int main(void)
 
 	BulletData[2] = new Bullet;
 	BulletData[2]->obj.Info.Color = 5;
-	BulletData[2]->obj.Info.Texture[0] = (char*)"¥È";
+	BulletData[2]->obj.Info.Texture[0] = (char*)"+";
 	BulletData[2]->obj.Speed = 3;
-	BulletData[2]->obj.TransInfo.Scale.x = strlen("¥È");
+	BulletData[2]->obj.TransInfo.Scale.x = strlen("+");
 	BulletData[2]->obj.TransInfo.Scale.y = 1;
 	BulletData[2]->obj.TransInfo.Rotation.x = 1;
 	BulletData[2]->obj.TransInfo.Rotation.y = 0;
@@ -80,6 +80,14 @@ int main(void)
 	hit = new Effect;
 	hit->obj.Info.Color = 12;
 	hit->obj.Info.Texture[0] = (char *)"¢Í";
+	hit->obj.Speed = 1;
+	hit->obj.TransInfo.Scale.x = strlen("¢Í");
+	hit->obj.TransInfo.Scale.y = 1.0f;
+	hit->time = 0;
+
+	hit = new Effect;
+	hit->obj.Info.Color = 12;
+	hit->obj.Info.Texture[0] = (char*)"¢Í";
 	hit->obj.Speed = 1;
 	hit->obj.TransInfo.Scale.x = strlen("¢Í");
 	hit->obj.TransInfo.Scale.y = 1.0f;

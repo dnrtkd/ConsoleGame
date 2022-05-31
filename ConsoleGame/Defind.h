@@ -6,6 +6,8 @@ static Player player;
 
 static Bullet* BulletData[6];
 
+static int Score=0;
+
 static Bullet* bullets[128] = { nullptr };
 static Bullet* eBullets[128] = { nullptr };
 static Effect* hitEffect[32] = { nullptr };
@@ -301,19 +303,19 @@ Effect* createEffect(Effect* src,float _x,float _y)
 void UpdateInput()
 {
 	// ** [상] 키를 입력받음.
-	if (GetAsyncKeyState(VK_UP))
+	if (GetAsyncKeyState(VK_UP)&& player.obj.TransInfo.Position.y>2)
 		player.obj.TransInfo.Position.y -= player.obj.Speed;
 
 	// ** [하] 키를 입력받음.
-	if (GetAsyncKeyState(VK_DOWN))
+	if (GetAsyncKeyState(VK_DOWN) && player.obj.TransInfo.Position.y < 26)
 		player.obj.TransInfo.Position.y += player.obj.Speed;
 
 	// ** [좌] 키를 입력받음.
-	if (GetAsyncKeyState(VK_LEFT))
+	if (GetAsyncKeyState(VK_LEFT) && player.obj.TransInfo.Position.x > 1)
 		player.obj.TransInfo.Position.x -= player.obj.Speed;
 
 	// ** [우] 키를 입력받음.
-	if (GetAsyncKeyState(VK_RIGHT))
+	if (GetAsyncKeyState(VK_RIGHT) && player.obj.TransInfo.Position.x < 148)
 		player.obj.TransInfo.Position.x += player.obj.Speed;
 }
 //에너미나 플레이어를 인수로 받고 불렛을 반환
@@ -560,6 +562,7 @@ void Enemydied()
 			{
 				delete enemies[i];
 				enemies[i] = nullptr;
+				Score += 50;
 			}
 		}
 	}
@@ -627,8 +630,24 @@ void Stage_ONE()
 				move(&bullets[i]->obj, GetDirection(&enemies[bullets[i]->tagetIndex]->obj,&bullets[i]->obj));
 				else
 				{
-					delete  bullets[i];
-					bullets[i] = nullptr;
+					float dis = 0;
+					float Min = 0;
+					int index = 0;
+					for (size_t j = 0; j < 32; j++)
+					{
+						if (enemies[j])
+						{
+							dis = GetDistance(&enemies[j]->obj, &bullets[i]->obj);
+							if (Min == 0)
+								Min = dis;
+							if (dis < Min)
+							{
+								Min = dis;
+								index = j;
+							}
+						}
+					}
+					bullets[i]->tagetIndex = index;
 				}
 			}
 			
@@ -760,5 +779,8 @@ void Stage_ONE()
 		}
 	}
 	
-
+	//**********      UI 부분
+	SetTextColor(15); SetCursorPosition(maxWidth/2 - strlen("Score:"), 2); cout << "Score:" << Score;
 }
+
+
