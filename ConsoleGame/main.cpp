@@ -51,31 +51,31 @@ int main(void)
 	
 
 	BulletData[0] = new Bullet;
-	BulletData[0]->Info.Color = 3;
-	BulletData[0]->Info.Texture[0] = (char*)">";
-	BulletData[0]->Speed = 3;
-	BulletData[0]->TransInfo.Scale.x = strlen(">");
-	BulletData[0]->TransInfo.Scale.y = 1;
-	BulletData[0]->TransInfo.Rotation.x = 1;
-	BulletData[0]->TransInfo.Rotation.y = 0;
+	BulletData[0]->obj.Info.Color = 3;
+	BulletData[0]->obj.Info.Texture[0] = (char*)">";
+	BulletData[0]->obj.Speed = 3;
+	BulletData[0]->obj.TransInfo.Scale.x = strlen(">");
+	BulletData[0]->obj.TransInfo.Scale.y = 1;
+	BulletData[0]->obj.TransInfo.Rotation.x = 1;
+	BulletData[0]->obj.TransInfo.Rotation.y = 0;
 
 	BulletData[1] = new Bullet;
-	BulletData[1]->Info.Color = 15;
-	BulletData[1]->Info.Texture[0] = (char*)"*";
-	BulletData[1]->Speed = 3;
-	BulletData[1]->TransInfo.Scale.x = strlen("*");
-	BulletData[1]->TransInfo.Scale.y = 1;
-	BulletData[1]->TransInfo.Rotation.x = -1;
-	BulletData[1]->TransInfo.Rotation.y = 0;
+	BulletData[1]->obj.Info.Color = 15;
+	BulletData[1]->obj.Info.Texture[0] = (char*)"*";
+	BulletData[1]->obj.Speed = 3;
+	BulletData[1]->obj.TransInfo.Scale.x = strlen("*");
+	BulletData[1]->obj.TransInfo.Scale.y = 1;
+	BulletData[1]->obj.TransInfo.Rotation.x = -1;
+	BulletData[1]->obj.TransInfo.Rotation.y = 0;
 
 	BulletData[2] = new Bullet;
-	BulletData[2]->Info.Color = 7;
-	BulletData[2]->Info.Texture[0] = (char*)"¡Û";
-	BulletData[2]->Speed = 3;
-	BulletData[2]->TransInfo.Scale.x = strlen("¡Û");
-	BulletData[2]->TransInfo.Scale.y = 1;
-	BulletData[2]->TransInfo.Rotation.x = 1;
-	BulletData[2]->TransInfo.Rotation.y = 0;
+	BulletData[2]->obj.Info.Color = 5;
+	BulletData[2]->obj.Info.Texture[0] = (char*)"¥È";
+	BulletData[2]->obj.Speed = 3;
+	BulletData[2]->obj.TransInfo.Scale.x = strlen("¥È");
+	BulletData[2]->obj.TransInfo.Scale.y = 1;
+	BulletData[2]->obj.TransInfo.Rotation.x = 1;
+	BulletData[2]->obj.TransInfo.Rotation.y = 0;
 
 	hit = new Effect;
 	hit->obj.Info.Color = 12;

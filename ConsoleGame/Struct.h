@@ -77,4 +77,9 @@ enum Scene
 	GameClear = 3
 };
 
-typedef Object Bullet;
+
+struct Bullet
+{
+	Object obj;
+	int tagetIndex;
+};
