@@ -92,6 +92,15 @@ int main(void)
 	hit->obj.TransInfo.Scale.x = strlen("¢Í");
 	hit->obj.TransInfo.Scale.y = 1.0f;
 	hit->time = 0;
+
+	ItemData[0] = new Item;
+	ItemData[0]->Info.Color = 4;
+	ItemData[0]->Info.Texture[0] = (char*)"[£Ì]";
+	ItemData[0]->Speed = 1;
+	ItemData[0]->TransInfo.Scale.x = strlen("[£Ì]");
+	ItemData[0]->TransInfo.Scale.y = 1;
+	ItemData[0]->TransInfo.Rotation.x = 0;
+	ItemData[0]->TransInfo.Rotation.y = 0;
 	for (int i = 0; i < 128; i++) //ºÒ·¿ ÃÊ±âÈ­
 	{
 

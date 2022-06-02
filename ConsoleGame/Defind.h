@@ -5,15 +5,17 @@ static int SceneState = 0;
 static Player player;
 
 static Bullet* BulletData[6];
-
+static Item* ItemData[4];
 static int Score=0;
 
 static Bullet* bullets[128] = { nullptr };
 static Bullet* eBullets[128] = { nullptr };
 static Effect* hitEffect[32] = { nullptr };
 static Enemy* enemies[32] = { nullptr };
+static Item* appearItem = nullptr;
 static Enemy* enemy1;
 static Effect* hit;
+
 
 static int maxWidth = 150;
 static int maxHight = 30;
@@ -21,6 +23,7 @@ static int maxHight = 30;
 //딜레이 계산할때 쓰는 함수
 static long delayTime = 0;
 static long enemyResporn = 0;
+static long itemTimer = 0;
 
 // ** 초기화 함수 (디폴트 매개변수 : int _Value = 0)
 void Initialize(Object* _Object, char* _Texture, int _PosX = 0, int _PosY = 0);
@@ -86,7 +89,24 @@ Bullet* CreateGBullet(Bullet* src, float _x, float _y);//유도탄
 Bullet* CreateBullet(Bullet* src, float _x, float _y, Vector2 dir);
 
 void move(Object* obj, Vector2 direction);
+
+Item* CreateItem(Item* src, int x, int y);
 // ** 함수 정의부
+Item* CreateItem(Item* src,int x, int y)
+{
+	Item* item = new Item;
+
+	item->Info.Color = src->Info.Color;
+	item->Info.Texture[0] = src->Info.Texture[0];
+	item->Speed = src->Speed;
+	item->TransInfo.Scale.x = src->TransInfo.Scale.x;
+	item->TransInfo.Scale.y = src->TransInfo.Scale.y;
+	item->TransInfo.Position.x = x;
+	item->TransInfo.Position.y = y;
+	item->TransInfo.Rotation.x = src->TransInfo.Rotation.x;
+	item->TransInfo.Rotation.y = src->TransInfo.Rotation.y;
+	return item;
+}
 
 void SetPosition(int _x, int _y, char* _str, int _Color)
 {
@@ -717,11 +737,32 @@ void Stage_ONE()
 		}
 	}
 
-	
+	if (appearItem)
+	{
+		if (appearItem->TransInfo.Position.x < 2)
+		{
+			delete appearItem;
+			appearItem = nullptr;
+		}
+		else
+		{
+			move(appearItem, Vector2(-1, 0));
+		}
+		
+	}
 
 	EnemyHit();
 	Enemydied();
 
+	if (itemTimer == 0)
+		itemTimer = GetTickCount();
+
+
+	if (appearItem == nullptr && itemTimer+5000<GetTickCount())
+	{
+		itemTimer = GetTickCount();
+		appearItem = CreateItem(ItemData[0], 140, 15);
+	}
 	
 	AppearEnemy(enemy1);
 
@@ -777,6 +818,11 @@ void Stage_ONE()
 		{
 			OnDrawText(&hitEffect[i]->obj);
 		}
+	}
+
+	if (appearItem)
+	{
+		OnDrawText(appearItem);
 	}
 	
 	//**********      UI 부분

@@ -83,3 +83,5 @@ struct Bullet
 	Object obj;
 	int tagetIndex;
 };
+
+typedef Object Item;
