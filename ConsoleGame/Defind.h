@@ -14,6 +14,7 @@ static Effect* hitEffect[32] = { nullptr };
 static Enemy* enemies[32] = { nullptr };
 static Item* appearItem = nullptr;
 static Enemy* enemy1;
+static Enemy* enemy2;
 static Effect* hit;
 
 
@@ -24,6 +25,8 @@ static int maxHight = 30;
 static long delayTime = 0;
 static long enemyResporn = 0;
 static long itemTimer = 0;
+
+static double GameTime = 0;
 
 // ** 초기화 함수 (디폴트 매개변수 : int _Value = 0)
 void Initialize(Object* _Object, char* _Texture, int _PosX = 0, int _PosY = 0);
@@ -90,6 +93,8 @@ Bullet* CreateBullet(Bullet* src, float _x, float _y, Vector2 dir);
 
 void move(Object* obj, Vector2 direction);
 
+void invokeTem(const Item* item);
+
 Item* CreateItem(Item* src, int x, int y);
 // ** 함수 정의부
 Item* CreateItem(Item* src,int x, int y)
@@ -97,10 +102,13 @@ Item* CreateItem(Item* src,int x, int y)
 	Item* item = new Item;
 
 	item->Info.Color = src->Info.Color;
-	item->Info.Texture[0] = src->Info.Texture[0];
 	item->Speed = src->Speed;
 	item->TransInfo.Scale.x = src->TransInfo.Scale.x;
 	item->TransInfo.Scale.y = src->TransInfo.Scale.y;
+	for (size_t i = 0; i < item->TransInfo.Scale.y; i++)
+	{
+		item->Info.Texture[i] = src->Info.Texture[i];
+	}
 	item->TransInfo.Position.x = x;
 	item->TransInfo.Position.y = y;
 	item->TransInfo.Rotation.x = src->TransInfo.Rotation.x;
@@ -190,7 +198,8 @@ void OnDrawText(Object* obj)
 	for (int i = 0; i < obj->TransInfo.Scale.y; i++)
 	{
 		SetCursorPosition(obj->TransInfo.Position.x, obj->TransInfo.Position.y+i);
-		cout << obj->Info.Texture[i];
+
+		cout<<obj->Info.Texture[i];
 	}
 }
 
@@ -472,6 +481,7 @@ Enemy* CreateEnemy(Enemy* src,int _x,int _y)
 	des->obj.TransInfo.Position.y= _y;
 	des->obj.Speed = src->obj.Speed;
 	des->time = 0;
+	des->obj.Info.Option = src->obj.Info.Option;
 	return des;
 }
 
@@ -500,17 +510,53 @@ void EnemyShoot(Enemy* enemy)
 	if (enemy->time+ enemy->delay < GetTickCount())
 	{
 		enemy->time = GetTickCount();
-
-		for (int i = 0; i < 128; i++)
+		if (enemy->obj.Info.Option == 0)
 		{
-			if (eBullets[i] ==nullptr)
+			for (int i = 0; i < 128; i++)
 			{
-				eBullets[i] = CreateBullet(BulletData[1], enemy->obj.TransInfo.Position.x - 2,
-					enemy->obj.TransInfo.Position.y);
-				eBullets[i]->obj.TransInfo.Rotation = GetDirection(&player.obj, &eBullets[i]->obj);
-				break;
+				if (eBullets[i] == nullptr)
+				{
+					eBullets[i] = CreateBullet(BulletData[1], enemy->obj.TransInfo.Position.x - 2,
+						enemy->obj.TransInfo.Position.y);
+					eBullets[i]->obj.TransInfo.Rotation = GetDirection(&player.obj, &eBullets[i]->obj);
+					break;
+				}
 			}
 		}
+		else if (enemy->obj.Info.Option == 1) //2번 적 객체
+		{
+			for (int i = 0; i < 128; i++)
+			{
+				if (eBullets[i] == nullptr)
+				{
+					eBullets[i] = CreateBullet(BulletData[1], enemy->obj.TransInfo.Position.x - 2,
+						enemy->obj.TransInfo.Position.y+1);
+					eBullets[i]->obj.TransInfo.Rotation = Vector2(-0.64, 0.36);
+					break;
+				}
+			}
+			for (int i = 0; i < 128; i++)
+			{
+				if (eBullets[i] == nullptr)
+				{
+					eBullets[i] = CreateBullet(BulletData[1], enemy->obj.TransInfo.Position.x - 2,
+						enemy->obj.TransInfo.Position.y+1);
+					eBullets[i]->obj.TransInfo.Rotation = Vector2(-1, 0);
+					break;
+				}
+			}
+			for (int i = 0; i < 128; i++)
+			{
+				if (eBullets[i] == nullptr)
+				{
+					eBullets[i] = CreateBullet(BulletData[1], enemy->obj.TransInfo.Position.x - 2,
+						enemy->obj.TransInfo.Position.y+1);
+					eBullets[i]->obj.TransInfo.Rotation = Vector2(-0.64, -0.36);
+					break;
+				}
+			}
+		}
+		
 	}
 
 }
@@ -588,6 +634,12 @@ void Enemydied()
 	}
 }
 
+void invokeTem(const Item* item)
+{
+	//if (item->Info.Option == 0)// 인덱스
+		player.level++;
+}
+
 void SceneManaer()
 {
 	switch (SceneState)
@@ -629,7 +681,7 @@ void move(Object* obj,Vector2 direction)
 
 void Stage_ONE()
 {
-	
+	GameTime += 0.08;
 	// 계산 하는 부분
 
 	for (int i = 0; i < 128; i++) //총알 이동
@@ -744,11 +796,16 @@ void Stage_ONE()
 			delete appearItem;
 			appearItem = nullptr;
 		}
+		else if (Collision(&player.obj,appearItem))
+		{
+			invokeTem(appearItem);
+			delete appearItem;
+			appearItem = nullptr;
+		}
 		else
 		{
 			move(appearItem, Vector2(-1, 0));
 		}
-		
 	}
 
 	EnemyHit();
@@ -758,14 +815,21 @@ void Stage_ONE()
 		itemTimer = GetTickCount();
 
 
-	if (appearItem == nullptr && itemTimer+5000<GetTickCount())
+	if (appearItem == nullptr && itemTimer+10000<GetTickCount())
 	{
 		itemTimer = GetTickCount();
 		appearItem = CreateItem(ItemData[0], 140, 15);
 	}
-	
-	AppearEnemy(enemy1);
 
+	if (GameTime > 15)
+	{
+		AppearEnemy(enemy2);
+	}
+	else
+	{
+		AppearEnemy(enemy1);
+	}
+	
 	for (int i = 0; i < 32; i++)
 	{
 		if (enemies[i])

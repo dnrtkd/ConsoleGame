@@ -30,7 +30,7 @@ int main(void)
 	player.obj.TransInfo.Scale.x = strlen("¢¸¡á¡ë");
 	player.obj.TransInfo.Scale.y = 2;
 	player.delay = 100; //0.1ÃÊ
-	player.level = 4;
+	player.level = 1;
 	long time=0;
 	
 	player.obj.TransInfo.Position.x = 10;
@@ -48,7 +48,22 @@ int main(void)
 	enemy1->obj.TransInfo.Rotation.x = -1;
 	enemy1->obj.TransInfo.Rotation.y = 0;
 	enemy1->time = 0;
-	
+	enemy1->obj.Info.Option = 0; //ÀÎµ¦½º
+
+	enemy2 = new Enemy;
+	enemy2->delay = 5000;
+	enemy2->hp = 50;
+	enemy2->obj.Speed = 1;
+	enemy2->obj.Info.Color = 5;
+	enemy2->obj.Info.Texture[0] = (char*)"    ¡û";
+	enemy2->obj.Info.Texture[1] = (char*)"¢æ¡Ý¡×";
+	enemy2->obj.Info.Texture[2] = (char*)"    ¡ú";
+	enemy2->obj.TransInfo.Scale.x = strlen("    ¡û");
+	enemy2->obj.TransInfo.Scale.y = 3;
+	enemy2->obj.TransInfo.Rotation.x = -1;
+	enemy2->obj.TransInfo.Rotation.y = 0;
+	enemy2->time = 0;
+	enemy2->obj.Info.Option = 1;
 
 	BulletData[0] = new Bullet;
 	BulletData[0]->obj.Info.Color = 3;
@@ -85,22 +100,17 @@ int main(void)
 	hit->obj.TransInfo.Scale.y = 1.0f;
 	hit->time = 0;
 
-	hit = new Effect;
-	hit->obj.Info.Color = 12;
-	hit->obj.Info.Texture[0] = (char*)"¢Í";
-	hit->obj.Speed = 1;
-	hit->obj.TransInfo.Scale.x = strlen("¢Í");
-	hit->obj.TransInfo.Scale.y = 1.0f;
-	hit->time = 0;
-
 	ItemData[0] = new Item;
 	ItemData[0]->Info.Color = 4;
-	ItemData[0]->Info.Texture[0] = (char*)"[£Ì]";
+	ItemData[0]->Info.Texture[0] = (char*)"¡á¡á¡á";
+	ItemData[0]->Info.Texture[1] = (char*)"¡á£Ì¡á";
+	ItemData[0]->Info.Texture[2] = (char*)"¡á¡á¡á";
 	ItemData[0]->Speed = 1;
-	ItemData[0]->TransInfo.Scale.x = strlen("[£Ì]");
-	ItemData[0]->TransInfo.Scale.y = 1;
+	ItemData[0]->TransInfo.Scale.x = strlen("¡á¡á¡á");
+	ItemData[0]->TransInfo.Scale.y =3;
 	ItemData[0]->TransInfo.Rotation.x = 0;
 	ItemData[0]->TransInfo.Rotation.y = 0;
+	ItemData[0]->Info.Option = 0;
 	for (int i = 0; i < 128; i++) //ºÒ·¿ ÃÊ±âÈ­
 	{
 
