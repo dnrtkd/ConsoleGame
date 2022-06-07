@@ -4,8 +4,11 @@ static int SceneState = 0;
 
 static Player player;
 
-static Bullet* BulletData[6];
-static Item* ItemData[4];
+static Bullet* BulletData[4];
+static Enemy* EnemyData[3];
+static Effect* EffectData[2];
+static Item* ItemData[3];
+
 static int Score=0;
 
 static Bullet* bullets[128] = { nullptr };
@@ -13,8 +16,6 @@ static Bullet* eBullets[128] = { nullptr };
 static Effect* hitEffect[32] = { nullptr };
 static Enemy* enemies[32] = { nullptr };
 static Item* appearItem = nullptr;
-static Enemy* enemy1;
-static Enemy* enemy2;
 static Effect* hit;
 
 
@@ -113,6 +114,7 @@ Item* CreateItem(Item* src,int x, int y)
 	item->TransInfo.Position.y = y;
 	item->TransInfo.Rotation.x = src->TransInfo.Rotation.x;
 	item->TransInfo.Rotation.y = src->TransInfo.Rotation.y;
+	item->Info.Option = src->Info.Option;
 	return item;
 }
 
@@ -332,12 +334,12 @@ Effect* createEffect(Effect* src,float _x,float _y)
 void UpdateInput()
 {
 	// ** [상] 키를 입력받음.
-	if (GetAsyncKeyState(VK_UP)&& player.obj.TransInfo.Position.y>2)
-		player.obj.TransInfo.Position.y -= player.obj.Speed;
+	if (GetAsyncKeyState(VK_UP) && player.obj.TransInfo.Position.y > 2)
+		player.obj.TransInfo.Position.y -= 1;
 
 	// ** [하] 키를 입력받음.
 	if (GetAsyncKeyState(VK_DOWN) && player.obj.TransInfo.Position.y < 26)
-		player.obj.TransInfo.Position.y += player.obj.Speed;
+		player.obj.TransInfo.Position.y += 1;
 
 	// ** [좌] 키를 입력받음.
 	if (GetAsyncKeyState(VK_LEFT) && player.obj.TransInfo.Position.x > 1)
@@ -441,7 +443,7 @@ void PlayerShoot(Object* obj)
 			{
 				if (bullets[i] == nullptr)
 				{
-					bullets[i] = CreateGBullet(BulletData[2],
+					bullets[i] = CreateGBullet(BulletData[3],
 						obj->TransInfo.Position.x + obj->TransInfo.Scale.x + 3,
 						obj->TransInfo.Position.y -2);
 					break;
@@ -451,7 +453,7 @@ void PlayerShoot(Object* obj)
 			{
 				if (bullets[i] == nullptr)
 				{
-					bullets[i] = CreateGBullet(BulletData[2],
+					bullets[i] = CreateGBullet(BulletData[3],
 						obj->TransInfo.Position.x + obj->TransInfo.Scale.x + 3,
 						obj->TransInfo.Position.y + 2);
 					break;
@@ -488,8 +490,8 @@ Enemy* CreateEnemy(Enemy* src,int _x,int _y)
 void AppearEnemy(Enemy* src)
 {
 	srand(time(0));
-	int _x = rand() % 5 + 145;
-	int _y = rand() % 30;
+	int _x = rand() % 5 + 140;
+	int _y = rand() % 28+1;
 	if (enemyResporn +1000< GetTickCount())
 	{
 		enemyResporn = GetTickCount();
@@ -611,12 +613,11 @@ void HitEffect(int _x,int _y)
 	{
 		if (hitEffect[i] == nullptr)
 		{
-			hitEffect[i] = createEffect(hit, _x, _y);
+			hitEffect[i] = createEffect(EffectData[0], _x, _y);
 			break;
 		}
 	}
 }
-
 
 void Enemydied()
 {
@@ -636,8 +637,15 @@ void Enemydied()
 
 void invokeTem(const Item* item)
 {
-	//if (item->Info.Option == 0)// 인덱스
+	if (item->Info.Option == 0 && player.level < 4) //레벨
 		player.level++;
+	else if (item->Info.Option == 1) //목숨
+		player.chance++;
+	else if (item->Info.Option == 2) //폭탄
+	{
+
+	}
+		
 }
 
 void SceneManaer()
@@ -702,6 +710,7 @@ void Stage_ONE()
 				move(&bullets[i]->obj, GetDirection(&enemies[bullets[i]->tagetIndex]->obj,&bullets[i]->obj));
 				else
 				{
+					move(&bullets[i]->obj,Vector2(0.5,0));
 					float dis = 0;
 					float Min = 0;
 					int index = 0;
@@ -759,7 +768,6 @@ void Stage_ONE()
 		}
 	}
 
-
 	for (size_t i = 0; i < 32; i++) //에너미 이동
 	{
 		if (enemies[i])
@@ -781,13 +789,14 @@ void Stage_ONE()
 		
 		if (hitEffect[i])
 		{
-			if (hitEffect[i]->time + 300 < GetTickCount())
+			if (hitEffect[i]->time + 100 < GetTickCount())
 			{
 				delete hitEffect[i];
 				hitEffect[i] = nullptr;
 			}
 		}
 	}
+
 
 	if (appearItem)
 	{
@@ -821,13 +830,17 @@ void Stage_ONE()
 		appearItem = CreateItem(ItemData[0], 140, 15);
 	}
 
-	if (GameTime > 15)
+	if (GameTime > 5)
 	{
-		AppearEnemy(enemy2);
+		AppearEnemy(EnemyData[0]);
 	}
-	else
+	else if(GameTime > 30)
 	{
-		AppearEnemy(enemy1);
+		AppearEnemy(EnemyData[1]);
+	}
+	else if (GameTime > 55)
+	{
+		AppearEnemy(EnemyData[2]);
 	}
 	
 	for (int i = 0; i < 32; i++)

@@ -36,34 +36,49 @@ int main(void)
 	player.obj.TransInfo.Position.x = 10;
 	player.obj.TransInfo.Position.y = 20;
 
-	enemy1 = new Enemy;
-	enemy1->delay = 2000;
-	enemy1->hp = 50;
-	enemy1->obj.Speed = 1;
-	enemy1->obj.Info.Color = 5;
-	enemy1->obj.Info.Texture[0] = (char*)"¡Û¡à¢º";
-	enemy1->obj.Info.Texture[1] = (char*)" ¡å¢º ";
-	enemy1->obj.TransInfo.Scale.x = strlen("¡Û¡à¢º");
-	enemy1->obj.TransInfo.Scale.y = 2;
-	enemy1->obj.TransInfo.Rotation.x = -1;
-	enemy1->obj.TransInfo.Rotation.y = 0;
-	enemy1->time = 0;
-	enemy1->obj.Info.Option = 0; //ÀÎµ¦½º
+	EnemyData[0] = new Enemy;
+	EnemyData[0]->delay = 2000;
+	EnemyData[0]->hp = 50;
+	EnemyData[0]->obj.Speed = 1;
+	EnemyData[0]->obj.Info.Color = 8;
+	EnemyData[0]->obj.Info.Texture[0] = (char*)"¡Û¡à¢º";
+	EnemyData[0]->obj.Info.Texture[1] = (char*)" ¡å¢º ";
+	EnemyData[0]->obj.TransInfo.Scale.x = strlen("¡Û¡à¢º");
+	EnemyData[0]->obj.TransInfo.Scale.y = 2;
+	EnemyData[0]->obj.TransInfo.Rotation.x = -1;
+	EnemyData[0]->obj.TransInfo.Rotation.y = 0;
+	EnemyData[0]->time = 0;
+	EnemyData[0]->obj.Info.Option = 0; //ÀÎµ¦½º
 
-	enemy2 = new Enemy;
-	enemy2->delay = 5000;
-	enemy2->hp = 50;
-	enemy2->obj.Speed = 1;
-	enemy2->obj.Info.Color = 5;
-	enemy2->obj.Info.Texture[0] = (char*)"    ¡û";
-	enemy2->obj.Info.Texture[1] = (char*)"¢æ¡Ý¡×";
-	enemy2->obj.Info.Texture[2] = (char*)"    ¡ú";
-	enemy2->obj.TransInfo.Scale.x = strlen("    ¡û");
-	enemy2->obj.TransInfo.Scale.y = 3;
-	enemy2->obj.TransInfo.Rotation.x = -1;
-	enemy2->obj.TransInfo.Rotation.y = 0;
-	enemy2->time = 0;
-	enemy2->obj.Info.Option = 1;
+	EnemyData[1] = new Enemy;
+	EnemyData[1]->delay = 3000;
+	EnemyData[1]->hp = 100;
+	EnemyData[1]->obj.Speed = 1;
+	EnemyData[1]->obj.Info.Color = 8;
+	EnemyData[1]->obj.Info.Texture[0] = (char*)"    ¡û";
+	EnemyData[1]->obj.Info.Texture[1] = (char*)"¢æ¡Ý¡×";
+	EnemyData[1]->obj.Info.Texture[2] = (char*)"    ¡ú";
+	EnemyData[1]->obj.TransInfo.Scale.x = strlen("    ¡û");
+	EnemyData[1]->obj.TransInfo.Scale.y = 3;
+	EnemyData[1]->obj.TransInfo.Rotation.x = -1;
+	EnemyData[1]->obj.TransInfo.Rotation.y = 0;
+	EnemyData[1]->time = 0;
+	EnemyData[1]->obj.Info.Option = 1;
+
+	EnemyData[2] = new Enemy;
+	EnemyData[2]->delay = 2000;
+	EnemyData[2]->hp = 50;
+	EnemyData[2]->obj.Speed = 1;
+	EnemyData[2]->obj.Info.Color = 7;
+	EnemyData[2]->obj.Info.Texture[0] = (char*)"£¼¢Ç¢Ç¢Ç¢º";
+	EnemyData[2]->obj.Info.Texture[1] = (char*)"    ¤±¡Ý¡×";
+	EnemyData[2]->obj.Info.Texture[2] = (char*)"£¼¢Ç¢Ç¢Ç¢º";
+	EnemyData[2]->obj.TransInfo.Scale.x = strlen("£¼¢Ç¢Ç¢Ç¢º");
+	EnemyData[2]->obj.TransInfo.Scale.y = 3;
+	EnemyData[2]->obj.TransInfo.Rotation.x = -1;
+	EnemyData[2]->obj.TransInfo.Rotation.y = 0;
+	EnemyData[2]->time = 0;
+	EnemyData[2]->obj.Info.Option = 2;
 
 	BulletData[0] = new Bullet;
 	BulletData[0]->obj.Info.Color = 3;
@@ -73,6 +88,7 @@ int main(void)
 	BulletData[0]->obj.TransInfo.Scale.y = 1;
 	BulletData[0]->obj.TransInfo.Rotation.x = 1;
 	BulletData[0]->obj.TransInfo.Rotation.y = 0;
+	BulletData[0]->obj.Info.Option = 0;
 
 	BulletData[1] = new Bullet;
 	BulletData[1]->obj.Info.Color = 15;
@@ -82,23 +98,46 @@ int main(void)
 	BulletData[1]->obj.TransInfo.Scale.y = 1;
 	BulletData[1]->obj.TransInfo.Rotation.x = -1;
 	BulletData[1]->obj.TransInfo.Rotation.y = 0;
+	BulletData[1]->obj.Info.Option = 1;
 
 	BulletData[2] = new Bullet;
-	BulletData[2]->obj.Info.Color = 5;
-	BulletData[2]->obj.Info.Texture[0] = (char*)"+";
-	BulletData[2]->obj.Speed = 3;
-	BulletData[2]->obj.TransInfo.Scale.x = strlen("+");
-	BulletData[2]->obj.TransInfo.Scale.y = 1;
-	BulletData[2]->obj.TransInfo.Rotation.x = 1;
+	BulletData[2]->obj.Info.Color = 15;
+	BulletData[2]->obj.Info.Texture[0] = (char*)"¡Ý¡Ý";
+	BulletData[2]->obj.Info.Texture[1] = (char*)"¡Ý¡Ý";
+	BulletData[2]->obj.Speed = 2;
+	BulletData[2]->obj.TransInfo.Scale.x = strlen("¡Ý¡Ý");
+	BulletData[2]->obj.TransInfo.Scale.y = 2;
+	BulletData[2]->obj.TransInfo.Rotation.x = -1;
 	BulletData[2]->obj.TransInfo.Rotation.y = 0;
+	BulletData[2]->obj.Info.Option = 2;
 
-	hit = new Effect;
-	hit->obj.Info.Color = 12;
-	hit->obj.Info.Texture[0] = (char *)"¢Í";
-	hit->obj.Speed = 1;
-	hit->obj.TransInfo.Scale.x = strlen("¢Í");
-	hit->obj.TransInfo.Scale.y = 1.0f;
-	hit->time = 0;
+	BulletData[3] = new Bullet;
+	BulletData[3]->obj.Info.Color = 5;
+	BulletData[3]->obj.Info.Texture[0] = (char*)"+";
+	BulletData[3]->obj.Speed = 5;
+	BulletData[3]->obj.TransInfo.Scale.x = strlen("+");
+	BulletData[3]->obj.TransInfo.Scale.y = 1;
+	BulletData[3]->obj.TransInfo.Rotation.x = 1;
+	BulletData[3]->obj.TransInfo.Rotation.y = 0;
+	BulletData[3]->obj.Info.Option = 3;
+
+	EffectData[0] = new Effect;
+	EffectData[0]->obj.Info.Color = 12;
+	EffectData[0]->obj.Info.Texture[0] = (char *)"¨¬";
+	EffectData[0]->obj.Speed = 3;
+	EffectData[0]->obj.TransInfo.Scale.x = strlen("¨¬");
+	EffectData[0]->obj.TransInfo.Scale.y = 1.0f;
+	EffectData[0]->time = 0;
+	EffectData[0]->obj.Info.Option = 0;
+
+	EffectData[1] = new Effect;
+	EffectData[1]->obj.Info.Color = 12;
+	EffectData[1]->obj.Info.Texture[0] = (char*)"¡Ù";
+	EffectData[1]->obj.Speed = 1;
+	EffectData[1]->obj.TransInfo.Scale.x = strlen("¡Ù");
+	EffectData[1]->obj.TransInfo.Scale.y = 1.0f;
+	EffectData[1]->time = 0;
+	EffectData[1]->obj.Info.Option = 1;
 
 	ItemData[0] = new Item;
 	ItemData[0]->Info.Color = 4;
@@ -111,6 +150,30 @@ int main(void)
 	ItemData[0]->TransInfo.Rotation.x = 0;
 	ItemData[0]->TransInfo.Rotation.y = 0;
 	ItemData[0]->Info.Option = 0;
+
+	ItemData[1] = new Item;
+	ItemData[1]->Info.Color = 4;
+	ItemData[1]->Info.Texture[0] = (char*)"¡á¡á¡á";
+	ItemData[1]->Info.Texture[1] = (char*)"¡á£È¡á";
+	ItemData[1]->Info.Texture[2] = (char*)"¡á¡á¡á";
+	ItemData[1]->Speed = 1;
+	ItemData[1]->TransInfo.Scale.x = strlen("¡á¡á¡á");
+	ItemData[1]->TransInfo.Scale.y = 3;
+	ItemData[1]->TransInfo.Rotation.x = 0;
+	ItemData[1]->TransInfo.Rotation.y = 0;
+	ItemData[1]->Info.Option = 1;
+
+	ItemData[2] = new Item;
+	ItemData[2]->Info.Color = 4;
+	ItemData[2]->Info.Texture[0] = (char*)"¡á¡á¡á";
+	ItemData[2]->Info.Texture[1] = (char*)"¡á£Â¡á";
+	ItemData[2]->Info.Texture[2] = (char*)"¡á¡á¡á";
+	ItemData[2]->Speed = 1;
+	ItemData[2]->TransInfo.Scale.x = strlen("¡á¡á¡á");
+	ItemData[2]->TransInfo.Scale.y = 3;
+	ItemData[2]->TransInfo.Rotation.x = 0;
+	ItemData[2]->TransInfo.Rotation.y = 0;
+	ItemData[2]->Info.Option = 2;
 	for (int i = 0; i < 128; i++) //ºÒ·¿ ÃÊ±âÈ­
 	{
 

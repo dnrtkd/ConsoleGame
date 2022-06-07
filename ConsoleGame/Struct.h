@@ -86,3 +86,9 @@ struct Bullet
 
 typedef Object Item;
 
+struct LageText
+{
+	char* texture[5][5];
+	long time; // 텍스트가 사라질 시간을 카운트
+	int color;
+};
