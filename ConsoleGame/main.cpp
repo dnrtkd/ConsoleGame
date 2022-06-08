@@ -16,7 +16,6 @@ int main(void)
 
 	system("title ȫ�浿 Framework v0.6");
 
-
 	player.chance = 3;
 	player.damage = 5;
 	player.delay=300;
@@ -82,9 +81,9 @@ int main(void)
 
 	BulletData[0] = new Bullet;
 	BulletData[0]->obj.Info.Color = 3;
-	BulletData[0]->obj.Info.Texture[0] = (char*)">";
+	BulletData[0]->obj.Info.Texture[0] = (char*)"-";
 	BulletData[0]->obj.Speed = 3;
-	BulletData[0]->obj.TransInfo.Scale.x = strlen(">");
+	BulletData[0]->obj.TransInfo.Scale.x = strlen("-");
 	BulletData[0]->obj.TransInfo.Scale.y = 1;
 	BulletData[0]->obj.TransInfo.Rotation.x = 1;
 	BulletData[0]->obj.TransInfo.Rotation.y = 0;

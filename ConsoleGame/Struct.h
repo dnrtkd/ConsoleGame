@@ -92,3 +92,14 @@ struct LageText
 	long time; // 텍스트가 사라질 시간을 카운트
 	int color;
 };
+
+struct Event //개수 , 시간 ,이벤트 사용여부
+{
+	int count;
+	int max;
+	int time;
+	bool use;
+
+	Event() {};
+	Event(int _max) { max = _max; count = 0; time = GetTickCount(); use = false; }
+};

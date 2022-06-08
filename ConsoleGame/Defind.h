@@ -29,6 +29,9 @@ static long itemTimer = 0;
 
 static double GameTime = 0;
 
+static int Life = 3;
+
+static Event* Even[20] = { nullptr };
 // ** 초기화 함수 (디폴트 매개변수 : int _Value = 0)
 void Initialize(Object* _Object, char* _Texture, int _PosX = 0, int _PosY = 0);
 
@@ -97,6 +100,10 @@ void move(Object* obj, Vector2 direction);
 void invokeTem(const Item* item);
 
 Item* CreateItem(Item* src, int x, int y);
+
+void EventAppearEnemy(Event* even, int _delay, int _Index_E, int creationWay = 0, float posiY=0);
+
+Event* Initi_Even(int _count);
 // ** 함수 정의부
 Item* CreateItem(Item* src,int x, int y)
 {
@@ -310,8 +317,6 @@ Bullet* CreateBullet(Bullet* src, float _x, float _y,Vector2 dir)
 	bul->obj.TransInfo.Rotation.y = dir.y;
 	return bul;
 }
-
-
 
 Effect* createEffect(Effect* src,float _x,float _y)
 {
@@ -687,6 +692,59 @@ void move(Object* obj,Vector2 direction)
 	obj->TransInfo.Position.y += direction.y * obj->Speed;
 }
 
+//생성하고자하는 적의 개수 , 생성 딜레이 ,적의 종류 , 포지션
+//마지막 매개변수는 몬스터들의 생성방식을 결정 
+void EventAppearEnemy(Event* even, int _delay, int _Index_E, int creationWay, float posiY )
+{
+	if (even->count == even->max)  //
+	{
+		even->use = true; //이미 사용된 이벤트
+	}
+
+	if (creationWay==1) //아래로 차례대로 생성
+	{
+		posiY += even->count*2;
+	}
+	else if (creationWay == 2) // 위로 차례대로 생성
+	{
+		posiY -= even->count * 2;
+	}
+	else if (creationWay == 3) //랜덤 생성
+	{
+		srand(time(0));
+
+		posiY = rand() % 27 + 2;
+	}
+
+	float posiX = 135;//maxWidth - EnemyData[_Index_E]->obj.TransInfo.Scale.x;
+
+	if (even->time+ _delay*1000 < GetTickCount())
+	{
+		even->time = GetTickCount();
+
+		for (int i = 0; i < 32; i++)
+		{
+			if (enemies[i] == nullptr)
+			{
+				enemies[i] = CreateEnemy(EnemyData[_Index_E], posiX, posiY);
+				even->count++;
+				break;
+			}
+		}
+	}
+}
+
+Event* Initi_Even(int _max)
+{
+	Event* temp = new Event;
+	temp->max = _max;
+	temp->time = GetTickCount();
+	temp->use = false;
+	temp->count = 0;
+
+	return temp;
+}
+
 void Stage_ONE()
 {
 	GameTime += 0.08;
@@ -832,15 +890,36 @@ void Stage_ONE()
 
 	if (GameTime > 5)
 	{
-		AppearEnemy(EnemyData[0]);
+		if (Even[0] == nullptr)
+			Even[0] = new Event(9);
+		if(Even[0]->use == false)
+		EventAppearEnemy(Even[0],1,0,1,2);
 	}
-	else if(GameTime > 30)
+	if(GameTime > 10)
 	{
-		AppearEnemy(EnemyData[1]);
+		if (Even[1] == nullptr)
+			Even[1] = new Event(4);
+		if (Even[1]->use == false)
+			EventAppearEnemy(Even[1], 2, 1, 3);
 	}
-	else if (GameTime > 55)
+	if (GameTime > 20)
 	{
-		AppearEnemy(EnemyData[2]);
+		if (Even[2] == nullptr)
+			Even[2] = new Event(6);
+		if (Even[2]->use == false)
+			EventAppearEnemy(Even[2], 2, 2, 2,25);
+	}
+	if (GameTime > 30)
+	{
+		if (Even[3] == nullptr)
+			Even[3] = new Event(9);
+		if (Even[3]->use == false)
+			EventAppearEnemy(Even[3], 1, 2, 3);
+	}
+
+	if (GameTime > 55)
+	{
+		//AppearEnemy(EnemyData[2]);
 	}
 	
 	for (int i = 0; i < 32; i++)
@@ -901,9 +980,10 @@ void Stage_ONE()
 	{
 		OnDrawText(appearItem);
 	}
-	
 	//**********      UI 부분
 	SetTextColor(15); SetCursorPosition(maxWidth/2 - strlen("Score:"), 2); cout << "Score:" << Score;
+	SetTextColor(15); SetCursorPosition(5, 28); cout << "LIFE:"; for (size_t i = 0; i < player.chance; i++) { cout << " ★"; }
+
 }
 
 
