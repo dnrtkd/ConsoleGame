@@ -29,7 +29,7 @@ struct Information
 
 struct Object
 {
-	int Speed;
+	float Speed;
 
 	Information Info;
 	Trasnsform TransInfo;
@@ -44,10 +44,16 @@ struct Effect
 struct Enemy
 {
 	Object obj;
-	int time;
-	int hitTime;
+
+	int timer;
+	int delay;  //ÃÑ¾Ë ¿¬»ç ¼Óµµ
+
+	int count; //ÇÑ Â÷·Ê¿¡ ½ò ÃÑ¾Ë °³¼ö
+
 	int hp;
-	int delay;
+
+	double lateTimer;
+	double lateTime; //ÇÑ ¹ø ÃÑ¾Ë ½î°í³­ÈÄ ÁöÃ¼½Ã°£
 };
 
 struct Player

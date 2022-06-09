@@ -101,7 +101,7 @@ void invokeTem(const Item* item);
 
 Item* CreateItem(Item* src, int x, int y);
 
-void EventAppearEnemy(Event* even, int _delay, int _Index_E, int creationWay = 0, float posiY=0);
+void EventAppearEnemy(Event* even, float _delay, int _Index_E, int creationWay, float posiY=0);
 
 Event* Initi_Even(int _count);
 // ** 함수 정의부
@@ -487,8 +487,11 @@ Enemy* CreateEnemy(Enemy* src,int _x,int _y)
 	des->obj.TransInfo.Position.x = _x;
 	des->obj.TransInfo.Position.y= _y;
 	des->obj.Speed = src->obj.Speed;
-	des->time = 0;
+	des->timer = 0;
 	des->obj.Info.Option = src->obj.Info.Option;
+	des->count = src->count;
+	des->lateTime = src->lateTime;
+	des->lateTimer = 0;
 	return des;
 }
 
@@ -514,18 +517,34 @@ void AppearEnemy(Enemy* src)
 
 void EnemyShoot(Enemy* enemy)
 {
-	if (enemy->time+ enemy->delay < GetTickCount())
+	if (enemy->count == 0)
 	{
-		enemy->time = GetTickCount();
+		enemy->obj.Info.Color = 14;
+		enemy->lateTimer+= + 0.08; // 프레임 만큼 더해줌
+		if (enemy->lateTimer > enemy->lateTime)
+		{
+			if (enemy->obj.Info.Option == 1)
+				enemy->count = 10;
+			else
+				enemy->count = 3;
+
+			enemy->lateTimer = 0;
+		}
+	}
+	if (enemy->timer+ enemy->delay < GetTickCount() && enemy->count != 0)
+	{
+		enemy->obj.Info.Color = 15;
+		enemy->timer = GetTickCount();
 		if (enemy->obj.Info.Option == 0)
 		{
 			for (int i = 0; i < 128; i++)
 			{
-				if (eBullets[i] == nullptr)
+				if (eBullets[i] == nullptr  )
 				{
 					eBullets[i] = CreateBullet(BulletData[1], enemy->obj.TransInfo.Position.x - 2,
 						enemy->obj.TransInfo.Position.y);
 					eBullets[i]->obj.TransInfo.Rotation = GetDirection(&player.obj, &eBullets[i]->obj);
+
 					break;
 				}
 			}
@@ -534,35 +553,19 @@ void EnemyShoot(Enemy* enemy)
 		{
 			for (int i = 0; i < 128; i++)
 			{
-				if (eBullets[i] == nullptr)
+				if (eBullets[i] == nullptr )
 				{
 					eBullets[i] = CreateBullet(BulletData[1], enemy->obj.TransInfo.Position.x - 2,
-						enemy->obj.TransInfo.Position.y+1);
-					eBullets[i]->obj.TransInfo.Rotation = Vector2(-0.64, 0.36);
-					break;
-				}
-			}
-			for (int i = 0; i < 128; i++)
-			{
-				if (eBullets[i] == nullptr)
-				{
-					eBullets[i] = CreateBullet(BulletData[1], enemy->obj.TransInfo.Position.x - 2,
-						enemy->obj.TransInfo.Position.y+1);
-					eBullets[i]->obj.TransInfo.Rotation = Vector2(-1, 0);
-					break;
-				}
-			}
-			for (int i = 0; i < 128; i++)
-			{
-				if (eBullets[i] == nullptr)
-				{
-					eBullets[i] = CreateBullet(BulletData[1], enemy->obj.TransInfo.Position.x - 2,
-						enemy->obj.TransInfo.Position.y+1);
-					eBullets[i]->obj.TransInfo.Rotation = Vector2(-0.64, -0.36);
+						enemy->obj.TransInfo.Position.y);
+					eBullets[i]->obj.TransInfo.Rotation = Vector2(-1, -0.25+enemy->count* 0.05);
+					
+
 					break;
 				}
 			}
 		}
+
+		enemy->count--;
 		
 	}
 
@@ -694,7 +697,7 @@ void move(Object* obj,Vector2 direction)
 
 //생성하고자하는 적의 개수 , 생성 딜레이 ,적의 종류 , 포지션
 //마지막 매개변수는 몬스터들의 생성방식을 결정 
-void EventAppearEnemy(Event* even, int _delay, int _Index_E, int creationWay, float posiY )
+void EventAppearEnemy(Event* even, float _delay, int _Index_E, int creationWay, float posiY )
 {
 	if (even->count == even->max)  //
 	{
@@ -711,7 +714,7 @@ void EventAppearEnemy(Event* even, int _delay, int _Index_E, int creationWay, fl
 	}
 	else if (creationWay == 3) //랜덤 생성
 	{
-		srand(time(0));
+		srand(GameTime*GameTime);
 
 		posiY = rand() % 27 + 2;
 	}
@@ -891,9 +894,9 @@ void Stage_ONE()
 	if (GameTime > 5)
 	{
 		if (Even[0] == nullptr)
-			Even[0] = new Event(9);
+			Even[0] = new Event(3);
 		if(Even[0]->use == false)
-		EventAppearEnemy(Even[0],1,0,1,2);
+		EventAppearEnemy(Even[0],2,1,1,5);
 	}
 	if(GameTime > 10)
 	{

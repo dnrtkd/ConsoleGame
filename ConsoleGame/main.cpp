@@ -38,7 +38,7 @@ int main(void)
 	EnemyData[0] = new Enemy;
 	EnemyData[0]->delay = 2000;
 	EnemyData[0]->hp = 50;
-	EnemyData[0]->obj.Speed = 1;
+	EnemyData[0]->obj.Speed = 0.5;
 	EnemyData[0]->obj.Info.Color = 8;
 	EnemyData[0]->obj.Info.Texture[0] = (char*)"¡Û¡à¢º";
 	EnemyData[0]->obj.Info.Texture[1] = (char*)" ¡å¢º ";
@@ -46,11 +46,13 @@ int main(void)
 	EnemyData[0]->obj.TransInfo.Scale.y = 2;
 	EnemyData[0]->obj.TransInfo.Rotation.x = -1;
 	EnemyData[0]->obj.TransInfo.Rotation.y = 0;
-	EnemyData[0]->time = 0;
+	EnemyData[0]->timer = 0;
 	EnemyData[0]->obj.Info.Option = 0; //ÀÎµ¦½º
+	EnemyData[0]->count = 1;
+	EnemyData[0]->lateTime = 0;
 
 	EnemyData[1] = new Enemy;
-	EnemyData[1]->delay = 3000;
+	EnemyData[1]->delay = 100;
 	EnemyData[1]->hp = 100;
 	EnemyData[1]->obj.Speed = 1;
 	EnemyData[1]->obj.Info.Color = 8;
@@ -61,8 +63,10 @@ int main(void)
 	EnemyData[1]->obj.TransInfo.Scale.y = 3;
 	EnemyData[1]->obj.TransInfo.Rotation.x = -1;
 	EnemyData[1]->obj.TransInfo.Rotation.y = 0;
-	EnemyData[1]->time = 0;
+	EnemyData[1]->timer = 0;
 	EnemyData[1]->obj.Info.Option = 1;
+	EnemyData[1]->count = 10;
+	EnemyData[1]->lateTime = 3;
 
 	EnemyData[2] = new Enemy;
 	EnemyData[2]->delay = 2000;
@@ -76,8 +80,10 @@ int main(void)
 	EnemyData[2]->obj.TransInfo.Scale.y = 3;
 	EnemyData[2]->obj.TransInfo.Rotation.x = -1;
 	EnemyData[2]->obj.TransInfo.Rotation.y = 0;
-	EnemyData[2]->time = 0;
+	EnemyData[2]->timer = 0;
 	EnemyData[2]->obj.Info.Option = 2;
+	EnemyData[2]->count = 1;
+	EnemyData[2]->lateTime = 0;
 
 	BulletData[0] = new Bullet;
 	BulletData[0]->obj.Info.Color = 3;
