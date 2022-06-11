@@ -32,6 +32,12 @@ static double GameTime = 0;
 static int Life = 3;
 
 static Event* Even[20] = { nullptr };
+static LargeText* LevelUp = nullptr;
+
+static bool LevelUpSwitch = false;
+
+static Object* moon[4] = { nullptr };
+
 // ** 초기화 함수 (디폴트 매개변수 : int _Value = 0)
 void Initialize(Object* _Object, char* _Texture, int _PosX = 0, int _PosY = 0);
 
@@ -101,9 +107,10 @@ void invokeTem(const Item* item);
 
 Item* CreateItem(Item* src, int x, int y);
 
-void EventAppearEnemy(Event* even, float _delay, int _Index_E, int creationWay, float posiY=0);
+void EventAppearEnemy(Event* even, float _delay, int _Index_E, int creationWay, float posiY = 0);
 
 Event* Initi_Even(int _count);
+void EventUi(LargeText* text, int delay, int _x, int _y, bool* _switch);
 // ** 함수 정의부
 Item* CreateItem(Item* src,int x, int y)
 {
@@ -200,15 +207,50 @@ void OnDrawText(const char* _str, const int _x, const int _y, const int _Color)
 	cout << _str;
 }
 
-void OnDrawText(Object* obj)
+void OnDrawText(const Object* obj)
 {
-	SetTextColor(obj->Info.Color);
+	if (obj->TransInfo.Position.x > maxWidth-1 ||
+		obj->TransInfo.Position.x + obj->TransInfo.Scale.x<0 ||
+		obj->TransInfo.Position.y>maxHight ||
+		obj->TransInfo.Position.y + obj->TransInfo.Scale.y < 0) return;
 
-	for (int i = 0; i < obj->TransInfo.Scale.y; i++)
+	int sizeY = (int)obj->TransInfo.Scale.y;
+	int sizeX = (int)obj->TransInfo.Scale.x;
+
+
+	for (size_t i = 0; i < sizeY; i++)
 	{
-		SetCursorPosition(obj->TransInfo.Position.x, obj->TransInfo.Position.y+i);
+		char temp[128];
 
-		cout<<obj->Info.Texture[i];
+		int x = (int)obj->TransInfo.Position.x;
+		int y = (int)obj->TransInfo.Position.y;
+
+		if (x < 0)
+		{
+			int start = -x;
+			for (size_t j = start; j < sizeX; j++)
+			{
+				temp[j - start] = obj->Info.Texture[i][j];
+			}
+			temp[sizeX - start] = '\0';
+			x = 0;
+		}
+		else if (x + sizeX > maxWidth && x < maxWidth )
+		{
+			for (size_t j = 0; j < maxWidth - x; j++)
+			{
+				temp[j] = obj->Info.Texture[i][j];
+			}
+			temp[maxWidth - x] = '\0';
+		}
+		else
+			strcpy(temp, obj->Info.Texture[i]);
+
+		if (y + i < 30 && y + i >= 0)
+		{
+			SetCursorPosition(x, y + i);
+			cout << temp;
+		}
 	}
 }
 
@@ -338,20 +380,36 @@ Effect* createEffect(Effect* src,float _x,float _y)
 
 void UpdateInput()
 {
+	//// ** [상] 키를 입력받음.
+	//if (GetAsyncKeyState(VK_UP) && player.obj.TransInfo.Position.y > 2)
+	//	player.obj.TransInfo.Position.y -= 1;
+
+	//// ** [하] 키를 입력받음.
+	//if (GetAsyncKeyState(VK_DOWN) && player.obj.TransInfo.Position.y < 28)
+	//	player.obj.TransInfo.Position.y += 1;
+
+	//// ** [좌] 키를 입력받음.
+	//if (GetAsyncKeyState(VK_LEFT) && player.obj.TransInfo.Position.x > 1)
+	//	player.obj.TransInfo.Position.x -= player.obj.Speed;
+
+	//// ** [우] 키를 입력받음.
+	//if (GetAsyncKeyState(VK_RIGHT) && player.obj.TransInfo.Position.x < 148)
+	//	player.obj.TransInfo.Position.x += player.obj.Speed;
+
 	// ** [상] 키를 입력받음.
-	if (GetAsyncKeyState(VK_UP) && player.obj.TransInfo.Position.y > 2)
+	if (GetAsyncKeyState(VK_UP) )
 		player.obj.TransInfo.Position.y -= 1;
 
 	// ** [하] 키를 입력받음.
-	if (GetAsyncKeyState(VK_DOWN) && player.obj.TransInfo.Position.y < 26)
+	if (GetAsyncKeyState(VK_DOWN) )
 		player.obj.TransInfo.Position.y += 1;
 
 	// ** [좌] 키를 입력받음.
-	if (GetAsyncKeyState(VK_LEFT) && player.obj.TransInfo.Position.x > 1)
+	if (GetAsyncKeyState(VK_LEFT) )
 		player.obj.TransInfo.Position.x -= player.obj.Speed;
 
 	// ** [우] 키를 입력받음.
-	if (GetAsyncKeyState(VK_RIGHT) && player.obj.TransInfo.Position.x < 148)
+	if (GetAsyncKeyState(VK_RIGHT) )
 		player.obj.TransInfo.Position.x += player.obj.Speed;
 }
 //에너미나 플레이어를 인수로 받고 불렛을 반환
@@ -646,7 +704,10 @@ void Enemydied()
 void invokeTem(const Item* item)
 {
 	if (item->Info.Option == 0 && player.level < 4) //레벨
+	{
 		player.level++;
+		LevelUpSwitch = true;
+	}
 	else if (item->Info.Option == 1) //목숨
 		player.chance++;
 	else if (item->Info.Option == 2) //폭탄
@@ -719,7 +780,7 @@ void EventAppearEnemy(Event* even, float _delay, int _Index_E, int creationWay, 
 		posiY = rand() % 27 + 2;
 	}
 
-	float posiX = 135;//maxWidth - EnemyData[_Index_E]->obj.TransInfo.Scale.x;
+	float posiX = 160;//maxWidth - EnemyData[_Index_E]->obj.TransInfo.Scale.x;
 
 	if (even->time+ _delay*1000 < GetTickCount())
 	{
@@ -878,6 +939,11 @@ void Stage_ONE()
 		}
 	}
 
+	for (size_t i = 0; i < 4; i++)
+	{
+		move(moon[i], Vector2(-1, 0));
+	}
+
 	EnemyHit();
 	Enemydied();
 
@@ -944,6 +1010,28 @@ void Stage_ONE()
 	}
 
 	 //*****************콘솔 화면에 표시되는 부분*********
+	if (GameTime < 3)
+	{
+		int x = 45;
+		int y = 12;
+		SetTextColor(12); SetCursorPosition(x, y);
+		cout << " _______  _______  _______  _______  _______    _______  ____  ";
+		SetCursorPosition(x, y + 1);
+		cout << "|       ||       ||   _   ||       ||       |  |  _    ||    | ";
+		SetCursorPosition(x, y + 2);
+		cout << "|  _____||_     _||  |_|  ||    ___||    ___|  | | |   | |   | ";
+		SetCursorPosition(x, y + 3);
+		cout << "| |_____   |   |  |       ||   | __ |   |___   | | |   | |   | ";
+		SetCursorPosition(x, y + 4);
+		cout << "|_____  |  |   |  |       ||   ||  ||    ___|  | |_|   | |   | ";
+		SetCursorPosition(x, y + 5);
+		cout << " _____| |  |   |  |   _   ||   |_| ||   |___   |       | |   | ";
+		SetCursorPosition(x, y + 6);
+		cout << "|_______|  |___|  |__| |__||_______||_______|  |_______| |___| ";
+	}
+
+	if(LevelUpSwitch)
+	EventUi(LevelUp, 3, player.obj.TransInfo.Position.x-5, player.obj.TransInfo.Position.y-6, &LevelUpSwitch);
 
 	OnDrawText(&player.obj);
 
@@ -983,10 +1071,63 @@ void Stage_ONE()
 	{
 		OnDrawText(appearItem);
 	}
+
+	for (size_t i = 0; i < 4; i++)
+	{
+		OnDrawText(moon[i]);
+	}
 	//**********      UI 부분
 	SetTextColor(15); SetCursorPosition(maxWidth/2 - strlen("Score:"), 2); cout << "Score:" << Score;
 	SetTextColor(15); SetCursorPosition(5, 28); cout << "LIFE:"; for (size_t i = 0; i < player.chance; i++) { cout << " ★"; }
 
+	
+
 }
 
 
+
+void EventUi(LargeText* text,int delay,int _x, int _y,bool* _switch)
+{
+	if (text->timer == 0)
+		text->timer = GetTickCount();
+	if (text->timer + delay * 1000 < GetTickCount())
+	{
+		*_switch = false;
+		text->timer = 0;
+		return;
+	}
+
+	int sizeY = 5;
+	int posiX = _x;
+
+	for (size_t i = 0; i < sizeY; i++)
+	{
+		char temp[128];
+		if (_x < 0)
+		{
+			int start = -_x;
+			for (size_t j = start; j < strlen(text->texture[0]); j++)
+			{
+				temp[j - start] = text->texture[i][j];
+			}
+			temp[strlen(text->texture[0])-start] = '\0';
+			posiX = 0;
+		}
+		else if(_x+strlen(text->texture[i])>maxWidth && _x<maxWidth)
+		{
+			for (size_t j = 0; j < maxWidth-_x; j++)
+			{
+				temp[j] = text->texture[i][j];
+			}
+			temp[maxWidth - _x] = '\0';
+		}
+		else
+		strcpy(temp, text->texture[i]);
+		
+		if (_y + i<30 && _y+i>=0)
+		{
+			SetCursorPosition(posiX, _y + i);
+			cout << temp;
+		}
+	}
+}

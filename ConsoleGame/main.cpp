@@ -21,7 +21,7 @@ int main(void)
 	player.delay=300;
 	player.name = (char*)"È«±æµ¿";
 	player.obj.Info.Color = 10;
-	player.obj.Speed = 3;
+	player.obj.Speed = 2;
 	player.obj.TransInfo.Position.x= 0;
 	player.obj.TransInfo.Position.y = 0;
 	player.obj.Info.Texture[0] = (char*)"¢¸¡á¡ë";
@@ -38,7 +38,7 @@ int main(void)
 	EnemyData[0] = new Enemy;
 	EnemyData[0]->delay = 2000;
 	EnemyData[0]->hp = 50;
-	EnemyData[0]->obj.Speed = 0.5;
+	EnemyData[0]->obj.Speed = 2;
 	EnemyData[0]->obj.Info.Color = 8;
 	EnemyData[0]->obj.Info.Texture[0] = (char*)"¡Û¡à¢º";
 	EnemyData[0]->obj.Info.Texture[1] = (char*)" ¡å¢º ";
@@ -54,7 +54,7 @@ int main(void)
 	EnemyData[1] = new Enemy;
 	EnemyData[1]->delay = 100;
 	EnemyData[1]->hp = 100;
-	EnemyData[1]->obj.Speed = 1;
+	EnemyData[1]->obj.Speed = 2;
 	EnemyData[1]->obj.Info.Color = 8;
 	EnemyData[1]->obj.Info.Texture[0] = (char*)"    ¡û";
 	EnemyData[1]->obj.Info.Texture[1] = (char*)"¢æ¡Ý¡×";
@@ -71,7 +71,7 @@ int main(void)
 	EnemyData[2] = new Enemy;
 	EnemyData[2]->delay = 2000;
 	EnemyData[2]->hp = 50;
-	EnemyData[2]->obj.Speed = 1;
+	EnemyData[2]->obj.Speed = 2;
 	EnemyData[2]->obj.Info.Color = 7;
 	EnemyData[2]->obj.Info.Texture[0] = (char*)"£¼¢Ç¢Ç¢Ç¢º";
 	EnemyData[2]->obj.Info.Texture[1] = (char*)"    ¤±¡Ý¡×";
@@ -179,6 +179,34 @@ int main(void)
 	ItemData[2]->TransInfo.Rotation.x = 0;
 	ItemData[2]->TransInfo.Rotation.y = 0;
 	ItemData[2]->Info.Option = 2;
+
+	LevelUp = new LargeText;
+	LevelUp->texture[0] =(char*)"   __             __            ____";
+	LevelUp->texture[1] =(char*)"  / /__ _  _____ / / __ _____  / / /";
+	LevelUp->texture[2] =(char*)" / / -_) |/ / -_) / / // / _ \/_/_/ ";
+	LevelUp->texture[3] =(char*)"/_/\__/|___/\__/_/  \_,_/ .__(_|_)  ";
+	LevelUp->texture[4] =(char*)"                       /_/          ";
+	LevelUp->timer = 0;
+	LevelUp->color = 15;
+
+
+	for (size_t i = 0; i < 4; i++)
+	{
+		moon[i] = new Object;
+		moon[i]->Info.Texture[0] = (char*)"¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à";
+		moon[i]->Info.Texture[1] = (char*)"¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à  ";
+		moon[i]->Info.Texture[2] = (char*)"¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à    ";
+
+		moon[i]->Speed = 2;
+
+		moon[i]->TransInfo.Rotation.x = -1; moon[i]->TransInfo.Rotation.y = 0;
+		moon[i]->TransInfo.Scale.x = strlen("¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à");  moon[i]->TransInfo.Scale.y = 3;
+
+		moon[i]->TransInfo.Position.x = 100 + i * 80; moon[i]->TransInfo.Position.y = 27;
+	}
+
+
+	
 	for (int i = 0; i < 128; i++) //ºÒ·¿ ÃÊ±âÈ­
 	{
 

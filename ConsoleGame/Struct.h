@@ -1,6 +1,6 @@
 #pragma once
-
-struct Vector2
+#include <string.h>
+ struct Vector2
 {
 	float x; float y;
 
@@ -92,10 +92,10 @@ struct Bullet
 
 typedef Object Item;
 
-struct LageText
+struct LargeText
 {
-	char* texture[5][5];
-	long time; // 텍스트가 사라질 시간을 카운트
+	char* texture[5];
+	long timer; // 텍스트가 사라질 시간을 카운트
 	int color;
 };
 
