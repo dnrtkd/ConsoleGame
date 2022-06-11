@@ -18,6 +18,7 @@ static Enemy* enemies[32] = { nullptr };
 static Item* appearItem = nullptr;
 static Effect* hit;
 
+static Vector2 ScreenPosition;
 
 static int maxWidth = 150;
 static int maxHight = 30;
@@ -209,10 +210,13 @@ void OnDrawText(const char* _str, const int _x, const int _y, const int _Color)
 
 void OnDrawText(const Object* obj)
 {
-	if (obj->TransInfo.Position.x > maxWidth-1 ||
-		obj->TransInfo.Position.x + obj->TransInfo.Scale.x<0 ||
-		obj->TransInfo.Position.y>maxHight ||
-		obj->TransInfo.Position.y + obj->TransInfo.Scale.y < 0) return;
+	Vector2 Posi = { obj->TransInfo.Position.x-ScreenPosition.x ,
+		obj->TransInfo.Position.y- ScreenPosition.y};
+
+	if (Posi.x > maxWidth-1 ||
+		Posi.x + obj->TransInfo.Scale.x<0 ||
+		Posi.y>maxHight ||
+		Posi.y + obj->TransInfo.Scale.y < 0) return;
 
 	int sizeY = (int)obj->TransInfo.Scale.y;
 	int sizeX = (int)obj->TransInfo.Scale.x;
@@ -222,8 +226,8 @@ void OnDrawText(const Object* obj)
 	{
 		char temp[128];
 
-		int x = (int)obj->TransInfo.Position.x;
-		int y = (int)obj->TransInfo.Position.y;
+		int x = (int)Posi.x;
+		int y = (int)Posi.y;
 
 		if (x < 0)
 		{
@@ -252,17 +256,53 @@ void OnDrawText(const Object* obj)
 			cout << temp;
 		}
 	}
+
+	/*if (obj->TransInfo.Position.x > maxWidth - 1 ||
+		obj->TransInfo.Position.x + obj->TransInfo.Scale.x<0 ||
+		obj->TransInfo.Position.y>maxHight ||
+		obj->TransInfo.Position.y + obj->TransInfo.Scale.y < 0) return;
+
+	int sizeY = (int)obj->TransInfo.Scale.y;
+	int sizeX = (int)obj->TransInfo.Scale.x;
+
+
+	for (size_t i = 0; i < sizeY; i++)
+	{
+		char temp[128];
+
+		int x = (int)obj->TransInfo.Position.x;
+		int y = (int)obj->TransInfo.Position.y;
+
+		if (x < 0)
+		{
+			int start = -x;
+			for (size_t j = start; j < sizeX; j++)
+			{
+				temp[j - start] = obj->Info.Texture[i][j];
+			}
+			temp[sizeX - start] = '\0';
+			x = 0;
+		}
+		else if (x + sizeX > maxWidth && x < maxWidth)
+		{
+			for (size_t j = 0; j < maxWidth - x; j++)
+			{
+				temp[j] = obj->Info.Texture[i][j];
+			}
+			temp[maxWidth - x] = '\0';
+		}
+		else
+			strcpy(temp, obj->Info.Texture[i]);
+
+		if (y + i < 30 && y + i >= 0)
+		{
+			SetCursorPosition(x, y + i);
+			cout << temp;
+		}
+	}*/
 }
 
-void OnDrawText(const int _Value, const int _x, const int _y, const int _Color)
-{
-	SetCursorPosition(_x, _y);
-	SetTextColor(_Color);
 
-	char* pText = new char[4];
-	_itoa(_Value, pText, 10);
-	cout << _Value;
-}
 
 void HideCursor(const bool _Visible)
 {
@@ -380,37 +420,28 @@ Effect* createEffect(Effect* src,float _x,float _y)
 
 void UpdateInput()
 {
-	//// ** [상] 키를 입력받음.
-	//if (GetAsyncKeyState(VK_UP) && player.obj.TransInfo.Position.y > 2)
-	//	player.obj.TransInfo.Position.y -= 1;
-
-	//// ** [하] 키를 입력받음.
-	//if (GetAsyncKeyState(VK_DOWN) && player.obj.TransInfo.Position.y < 28)
-	//	player.obj.TransInfo.Position.y += 1;
-
-	//// ** [좌] 키를 입력받음.
-	//if (GetAsyncKeyState(VK_LEFT) && player.obj.TransInfo.Position.x > 1)
-	//	player.obj.TransInfo.Position.x -= player.obj.Speed;
-
-	//// ** [우] 키를 입력받음.
-	//if (GetAsyncKeyState(VK_RIGHT) && player.obj.TransInfo.Position.x < 148)
-	//	player.obj.TransInfo.Position.x += player.obj.Speed;
-
 	// ** [상] 키를 입력받음.
-	if (GetAsyncKeyState(VK_UP) )
+	if (GetAsyncKeyState(VK_UP) && player.obj.TransInfo.Position.y > 2)
+	{
 		player.obj.TransInfo.Position.y -= 1;
-
+		ScreenPosition.y -= 1;
+	}
 	// ** [하] 키를 입력받음.
-	if (GetAsyncKeyState(VK_DOWN) )
+	if (GetAsyncKeyState(VK_DOWN) && player.obj.TransInfo.Position.y < 28)
+	{
 		player.obj.TransInfo.Position.y += 1;
+		ScreenPosition.y+=1;
+	}
 
 	// ** [좌] 키를 입력받음.
-	if (GetAsyncKeyState(VK_LEFT) )
+	if (GetAsyncKeyState(VK_LEFT) && player.obj.TransInfo.Position.x > 1)
 		player.obj.TransInfo.Position.x -= player.obj.Speed;
 
 	// ** [우] 키를 입력받음.
-	if (GetAsyncKeyState(VK_RIGHT) )
+	if (GetAsyncKeyState(VK_RIGHT) && player.obj.TransInfo.Position.x < 148)
 		player.obj.TransInfo.Position.x += player.obj.Speed;
+
+	
 }
 //에너미나 플레이어를 인수로 받고 불렛을 반환
 void PlayerShoot(Object* obj)

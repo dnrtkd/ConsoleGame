@@ -229,7 +229,8 @@ int main(void)
 		hitEffect[i] = nullptr;
 	}
 
-
+	ScreenPosition.x = 0;
+	ScreenPosition.y = 0;
 	while (1)
 	{
 		if (time + 80 < GetTickCount())
