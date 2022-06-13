@@ -37,7 +37,11 @@ static LargeText* LevelUp = nullptr;
 
 static bool LevelUpSwitch = false;
 
-static Object* moon[4] = { nullptr };
+static Object* Wall[4] = { nullptr };
+
+static Object* Walls[16] = { nullptr };
+
+static long WallCreatTimer = 0;
 
 // ** 초기화 함수 (디폴트 매개변수 : int _Value = 0)
 void Initialize(Object* _Object, char* _Texture, int _PosX = 0, int _PosY = 0);
@@ -112,6 +116,8 @@ void EventAppearEnemy(Event* even, float _delay, int _Index_E, int creationWay, 
 
 Event* Initi_Even(int _count);
 void EventUi(LargeText* text, int delay, int _x, int _y, bool* _switch);
+
+Object* CreateWall(const Object* src, int posiX, int posiY);
 // ** 함수 정의부
 Item* CreateItem(Item* src,int x, int y)
 {
@@ -221,6 +227,7 @@ void OnDrawText(const Object* obj)
 	int sizeY = (int)obj->TransInfo.Scale.y;
 	int sizeX = (int)obj->TransInfo.Scale.x;
 
+	SetTextColor(obj->Info.Color);
 
 	for (size_t i = 0; i < sizeY; i++)
 	{
@@ -256,50 +263,6 @@ void OnDrawText(const Object* obj)
 			cout << temp;
 		}
 	}
-
-	/*if (obj->TransInfo.Position.x > maxWidth - 1 ||
-		obj->TransInfo.Position.x + obj->TransInfo.Scale.x<0 ||
-		obj->TransInfo.Position.y>maxHight ||
-		obj->TransInfo.Position.y + obj->TransInfo.Scale.y < 0) return;
-
-	int sizeY = (int)obj->TransInfo.Scale.y;
-	int sizeX = (int)obj->TransInfo.Scale.x;
-
-
-	for (size_t i = 0; i < sizeY; i++)
-	{
-		char temp[128];
-
-		int x = (int)obj->TransInfo.Position.x;
-		int y = (int)obj->TransInfo.Position.y;
-
-		if (x < 0)
-		{
-			int start = -x;
-			for (size_t j = start; j < sizeX; j++)
-			{
-				temp[j - start] = obj->Info.Texture[i][j];
-			}
-			temp[sizeX - start] = '\0';
-			x = 0;
-		}
-		else if (x + sizeX > maxWidth && x < maxWidth)
-		{
-			for (size_t j = 0; j < maxWidth - x; j++)
-			{
-				temp[j] = obj->Info.Texture[i][j];
-			}
-			temp[maxWidth - x] = '\0';
-		}
-		else
-			strcpy(temp, obj->Info.Texture[i]);
-
-		if (y + i < 30 && y + i >= 0)
-		{
-			SetCursorPosition(x, y + i);
-			cout << temp;
-		}
-	}*/
 }
 
 
@@ -424,13 +387,13 @@ void UpdateInput()
 	if (GetAsyncKeyState(VK_UP) && player.obj.TransInfo.Position.y > 2)
 	{
 		player.obj.TransInfo.Position.y -= 1;
-		ScreenPosition.y -= 1;
+		//ScreenPosition.y -= 1;
 	}
 	// ** [하] 키를 입력받음.
 	if (GetAsyncKeyState(VK_DOWN) && player.obj.TransInfo.Position.y < 28)
 	{
 		player.obj.TransInfo.Position.y += 1;
-		ScreenPosition.y+=1;
+		//ScreenPosition.y+=1;
 	}
 
 	// ** [좌] 키를 입력받음.
@@ -613,8 +576,10 @@ void EnemyShoot(Enemy* enemy)
 		if (enemy->lateTimer > enemy->lateTime)
 		{
 			if (enemy->obj.Info.Option == 1)
-				enemy->count = 10;
-			else
+				enemy->count = 5;
+			else if(enemy->obj.Info.Option == 0)
+				enemy->count = 3;
+			else if (enemy->obj.Info.Option == 2)
 				enemy->count = 3;
 
 			enemy->lateTimer = 0;
@@ -649,6 +614,20 @@ void EnemyShoot(Enemy* enemy)
 					eBullets[i]->obj.TransInfo.Rotation = Vector2(-1, -0.25+enemy->count* 0.05);
 					
 
+					break;
+				}
+			}
+		}
+
+		else if (enemy->obj.Info.Option == 2) //2번 적 객체
+		{
+			for (int i = 0; i < 128; i++)
+			{
+				if (eBullets[i] == nullptr)
+				{
+					eBullets[i] = CreateBullet(BulletData[2], enemy->obj.TransInfo.Position.x - 2,
+						enemy->obj.TransInfo.Position.y);
+					eBullets[i]->obj.TransInfo.Rotation = Vector2(-1, 0);
 					break;
 				}
 			}
@@ -808,7 +787,7 @@ void EventAppearEnemy(Event* even, float _delay, int _Index_E, int creationWay, 
 	{
 		srand(GameTime*GameTime);
 
-		posiY = rand() % 27 + 2;
+		posiY = rand() % 22 + 2;
 	}
 
 	float posiX = 160;//maxWidth - EnemyData[_Index_E]->obj.TransInfo.Scale.x;
@@ -840,10 +819,16 @@ Event* Initi_Even(int _max)
 	return temp;
 }
 
+
 void Stage_ONE()
 {
 	GameTime += 0.08;
 	// 계산 하는 부분
+	if (WallCreatTimer == 0)
+		WallCreatTimer = GetTickCount();
+
+	//ScreenPosition.x += 1;
+	//player.obj.TransInfo.Position.x += 1;
 
 	for (int i = 0; i < 128; i++) //총알 이동
 	{
@@ -970,9 +955,34 @@ void Stage_ONE()
 		}
 	}
 
-	for (size_t i = 0; i < 4; i++)
+	for (size_t i = 0; i < 16; i++)
 	{
-		move(moon[i], Vector2(-1, 0));
+		if (Walls[i])
+		{
+			if (Walls[i]->TransInfo.Position.x + Walls[i]->TransInfo.Scale.x < 0)
+			{
+				delete Walls[i];
+				Walls[i] = nullptr;
+			}
+			else 
+			{
+				move(Walls[i], Vector2(-1, 0));
+			}
+		}
+	}
+
+	if (WallCreatTimer + 2000 < GetTickCount())
+	{
+		WallCreatTimer = GetTickCount();
+		for (size_t i = 0; i < 16; i++)
+		{
+			if (Walls[i] == nullptr)
+			{
+				srand(GetTickCount() * GetTickCount());
+				Walls[i] = CreateWall(Wall[rand()%2+1], 180, 26);
+				break;
+			}
+		}
 	}
 
 	EnemyHit();
@@ -982,39 +992,39 @@ void Stage_ONE()
 		itemTimer = GetTickCount();
 
 
-	if (appearItem == nullptr && itemTimer+10000<GetTickCount())
+	if (appearItem == nullptr && itemTimer+15000<GetTickCount())
 	{
 		itemTimer = GetTickCount();
-		appearItem = CreateItem(ItemData[0], 140, 15);
+		appearItem = CreateItem(ItemData[0], 160, 15);
 	}
 
 	if (GameTime > 5)
 	{
 		if (Even[0] == nullptr)
-			Even[0] = new Event(3);
+			Even[0] = new Event(5);
 		if(Even[0]->use == false)
-		EventAppearEnemy(Even[0],2,1,1,5);
+		EventAppearEnemy(Even[0],2,0,1,5);
 	}
-	if(GameTime > 10)
+	if(GameTime > 15)
 	{
 		if (Even[1] == nullptr)
-			Even[1] = new Event(4);
+			Even[1] = new Event(5);
 		if (Even[1]->use == false)
-			EventAppearEnemy(Even[1], 2, 1, 3);
-	}
-	if (GameTime > 20)
-	{
-		if (Even[2] == nullptr)
-			Even[2] = new Event(6);
-		if (Even[2]->use == false)
-			EventAppearEnemy(Even[2], 2, 2, 2,25);
+			EventAppearEnemy(Even[1], 1, 0, 3);
 	}
 	if (GameTime > 30)
 	{
+		if (Even[2] == nullptr)
+			Even[2] = new Event(3);
+		if (Even[2]->use == false)
+			EventAppearEnemy(Even[2], 2, 1, 2,20);
+	}
+	if (GameTime > 40)
+	{
 		if (Even[3] == nullptr)
-			Even[3] = new Event(9);
+			Even[3] = new Event(6);
 		if (Even[3]->use == false)
-			EventAppearEnemy(Even[3], 1, 2, 3);
+			EventAppearEnemy(Even[3], 0.5, 0, 1,4);
 	}
 
 	if (GameTime > 55)
@@ -1064,6 +1074,12 @@ void Stage_ONE()
 	if(LevelUpSwitch)
 	EventUi(LevelUp, 3, player.obj.TransInfo.Position.x-5, player.obj.TransInfo.Position.y-6, &LevelUpSwitch);
 
+	for (size_t i = 0; i < 16; i++)
+	{
+		if (Walls[i])
+		OnDrawText(Walls[i]);
+	}
+
 	OnDrawText(&player.obj);
 
 	for (int i = 0; i < 128; i++)
@@ -1103,10 +1119,7 @@ void Stage_ONE()
 		OnDrawText(appearItem);
 	}
 
-	for (size_t i = 0; i < 4; i++)
-	{
-		OnDrawText(moon[i]);
-	}
+	
 	//**********      UI 부분
 	SetTextColor(15); SetCursorPosition(maxWidth/2 - strlen("Score:"), 2); cout << "Score:" << Score;
 	SetTextColor(15); SetCursorPosition(5, 28); cout << "LIFE:"; for (size_t i = 0; i < player.chance; i++) { cout << " ★"; }
@@ -1115,9 +1128,33 @@ void Stage_ONE()
 
 }
 
+Object* CreateWall(const Object* src,int posiX, int posiY)
+{
+	Object* temp = new Object;
+	temp->TransInfo.Scale.y = src->TransInfo.Scale.y;
+	temp->TransInfo.Scale.x = src->TransInfo.Scale.x;
+	for (size_t i = 0; i < src->TransInfo.Scale.y; i++)
+	{
+		temp->Info.Texture[i] = src->Info.Texture[i];
+	}
+	temp->Info.Option = src->Info.Option;
+	temp->TransInfo.Position.x = posiX;
+	temp->TransInfo.Position.y = posiY;
+	temp->Info.Color = src->Info.Color;
+	temp->Speed = 2;
+
+	return temp;
+}
+
+void wallBuitl()
+{
+
+}
+
 
 
 void EventUi(LargeText* text,int delay,int _x, int _y,bool* _switch)
+
 {
 	if (text->timer == 0)
 		text->timer = GetTickCount();

@@ -82,8 +82,8 @@ int main(void)
 	EnemyData[2]->obj.TransInfo.Rotation.y = 0;
 	EnemyData[2]->timer = 0;
 	EnemyData[2]->obj.Info.Option = 2;
-	EnemyData[2]->count = 1;
-	EnemyData[2]->lateTime = 0;
+	EnemyData[2]->count = 3;
+	EnemyData[2]->lateTime = 2;
 
 	BulletData[0] = new Bullet;
 	BulletData[0]->obj.Info.Color = 3;
@@ -161,7 +161,7 @@ int main(void)
 	ItemData[1]->Info.Texture[0] = (char*)"¡á¡á¡á";
 	ItemData[1]->Info.Texture[1] = (char*)"¡á£È¡á";
 	ItemData[1]->Info.Texture[2] = (char*)"¡á¡á¡á";
-	ItemData[1]->Speed = 1;
+	ItemData[1]->Speed = 2;
 	ItemData[1]->TransInfo.Scale.x = strlen("¡á¡á¡á");
 	ItemData[1]->TransInfo.Scale.y = 3;
 	ItemData[1]->TransInfo.Rotation.x = 0;
@@ -190,21 +190,40 @@ int main(void)
 	LevelUp->color = 15;
 
 
-	for (size_t i = 0; i < 4; i++)
-	{
-		moon[i] = new Object;
-		moon[i]->Info.Texture[0] = (char*)"¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à";
-		moon[i]->Info.Texture[1] = (char*)"¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à  ";
-		moon[i]->Info.Texture[2] = (char*)"¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à    ";
+	
+	//Wall[0] = new Object;
+	//Wall[0]->Info.Texture[0] = (char*)"     ¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à";
+	//Wall[0]->Info.Texture[1] = (char*)"  ¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à";
+	//Wall[0]->Info.Texture[2] = (char*)"¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à";
 
-		moon[i]->Speed = 2;
+	//Wall[0]->Speed = 0;
+	//Wall[0]->TransInfo.Rotation.x = -1;           Wall[0]->TransInfo.Rotation.y = 0;
+	//Wall[0]->TransInfo.Scale.x = strlen("¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à");  Wall [0]->TransInfo.Scale.y = 3;
+	//Wall[0]->TransInfo.Position.x = 0;            Wall [0]->TransInfo.Position.y =0;
+	//Wall[0]->Info.Option = 0;
+	//Wall[0]->Info.Color = 15;
 
-		moon[i]->TransInfo.Rotation.x = -1; moon[i]->TransInfo.Rotation.y = 0;
-		moon[i]->TransInfo.Scale.x = strlen("¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à");  moon[i]->TransInfo.Scale.y = 3;
+	Wall[1] = new Object;
+	Wall[1]->Info.Texture[0] = (char*)"    ¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à     ";
+	Wall[1]->Info.Texture[1] = (char*)"  ¡à¡à¡à¡à¡à¡à¡à  ¡à¡à¡à¡à¡à¡à¡à  ";
+	Wall[1]->Info.Texture[2] = (char*)"¡à¡à¡à¡à¡à¡à¡à      ¡à¡à¡à¡à¡à¡à¡à";
+	Wall[1]->Speed = 0;
+	Wall[1]->TransInfo.Rotation.x = -1;           Wall[1]->TransInfo.Rotation.y = 0;
+	Wall[1]->TransInfo.Scale.x = strlen("¡à¡à¡à¡à¡à¡à¡à      ¡à¡à¡à¡à¡à¡à¡à");  Wall[1]->TransInfo.Scale.y = 3;
+	Wall[1]->TransInfo.Position.x = 180;            Wall[1]->TransInfo.Position.y = 27;
+	Wall[1]->Info.Option = 1;
+	Wall[1]->Info.Color = 15;
 
-		moon[i]->TransInfo.Position.x = 100 + i * 80; moon[i]->TransInfo.Position.y = 27;
-	}
-
+	Wall[2] = new Object;
+	Wall[2]->Info.Texture[0] = (char*)"¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à";
+	Wall[2]->Info.Texture[1] = (char*)"¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à";
+	Wall[2]->Info.Texture[2] = (char*)"¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à";
+	Wall[2]->Speed = 0;
+	Wall[2]->TransInfo.Rotation.x = -1;           Wall[2]->TransInfo.Rotation.y = 0;
+	Wall[2]->TransInfo.Scale.x = strlen("¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à");  Wall[2]->TransInfo.Scale.y = 3;
+	Wall[2]->TransInfo.Position.x = 180;            Wall[2]->TransInfo.Position.y = 28;
+	Wall[2]->Info.Option = 2;
+	Wall[2]->Info.Color = 15;
 
 	
 	for (int i = 0; i < 128; i++) //ºÒ·¿ ÃÊ±âÈ­
@@ -229,8 +248,14 @@ int main(void)
 		hitEffect[i] = nullptr;
 	}
 
+	for (size_t i = 0; i < 16; i++)
+	{
+		Walls[i] = nullptr;
+	}
+
 	ScreenPosition.x = 0;
 	ScreenPosition.y = 0;
+
 	while (1)
 	{
 		if (time + 80 < GetTickCount())
