@@ -109,3 +109,5 @@ struct Event //개수 , 시간 ,이벤트 사용여부
 	Event() {};
 	Event(int _max) { max = _max; count = 0; time = GetTickCount(); use = false; }
 };
+
+

@@ -5,7 +5,7 @@ static int SceneState = 0;
 static Player player;
 
 static Bullet* BulletData[4];
-static Enemy* EnemyData[3];
+static Enemy* EnemyData[4];
 static Effect* EffectData[2];
 static Item* ItemData[3];
 
@@ -19,6 +19,8 @@ static Item* appearItem = nullptr;
 static Effect* hit;
 
 static Vector2 ScreenPosition;
+
+static Enemy* Boss=nullptr;
 
 static int maxWidth = 150;
 static int maxHight = 30;
@@ -42,6 +44,10 @@ static Object* Wall[4] = { nullptr };
 static Object* Walls[16] = { nullptr };
 
 static long WallCreatTimer = 0;
+
+static Object* Moon = nullptr;
+
+
 
 // ** 초기화 함수 (디폴트 매개변수 : int _Value = 0)
 void Initialize(Object* _Object, char* _Texture, int _PosX = 0, int _PosY = 0);
@@ -226,6 +232,8 @@ void OnDrawText(const Object* obj)
 
 	int sizeY = (int)obj->TransInfo.Scale.y;
 	int sizeX = (int)obj->TransInfo.Scale.x;
+
+	
 
 	SetTextColor(obj->Info.Color);
 
@@ -577,10 +585,12 @@ void EnemyShoot(Enemy* enemy)
 		{
 			if (enemy->obj.Info.Option == 1)
 				enemy->count = 5;
-			else if(enemy->obj.Info.Option == 0)
+			else if (enemy->obj.Info.Option == 0)
 				enemy->count = 3;
 			else if (enemy->obj.Info.Option == 2)
 				enemy->count = 3;
+			else if (enemy->obj.Info.Option == 3)
+				enemy->count = EnemyData[3]->count;
 
 			enemy->lateTimer = 0;
 		}
@@ -632,6 +642,49 @@ void EnemyShoot(Enemy* enemy)
 				}
 			}
 		}
+		else if (enemy->obj.Info.Option == 3) //2번 적 객체
+		{
+			for (int i = 0; i < 128; i++)
+			{
+				if (eBullets[i] == nullptr)
+				{
+					eBullets[i] = CreateBullet(BulletData[1], enemy->obj.TransInfo.Position.x - 2,
+						enemy->obj.TransInfo.Position.y+1);
+					eBullets[i]->obj.TransInfo.Rotation = Vector2(-1, 0.25 - enemy->count * 0.05);
+					break;
+				}
+			}
+			for (int i = 0; i < 128; i++)
+			{
+				if (eBullets[i] == nullptr)
+				{
+					eBullets[i] = CreateBullet(BulletData[1], enemy->obj.TransInfo.Position.x - 2,
+						enemy->obj.TransInfo.Position.y + 2);
+					eBullets[i]->obj.TransInfo.Rotation = Vector2(-1, 0);
+					break;
+				}
+			}
+			for (int i = 0; i < 128; i++)
+			{
+				if (eBullets[i] == nullptr)
+				{
+					eBullets[i] = CreateBullet(BulletData[1], enemy->obj.TransInfo.Position.x - 2,
+						enemy->obj.TransInfo.Position.y + 3);
+					eBullets[i]->obj.TransInfo.Rotation = Vector2(-1, -0.25 + enemy->count * 0.05);
+					break;
+				}
+			}
+
+			if (enemy->count % 10 == 0)
+			{
+				if (enemy->obj.TransInfo.Rotation.y == 0)
+					enemy->obj.TransInfo.Rotation.y == 1;
+
+				enemy->obj.TransInfo.Rotation.y *= -1;
+
+			}
+				
+		}
 
 		enemy->count--;
 		
@@ -661,26 +714,30 @@ float GetDistance(const Object* _ObjectA, const Object* _ObjectB)
 
 void EnemyHit()
 {
-	for (int i = 0; i < 32; i++)
-	{
-		if (enemies[i])
+	
+	
+		for (int i = 0; i < 32; i++)
 		{
-			for (int j = 0; j < 128; j++)
+			if (enemies[i])
 			{
-				if (bullets[j])
+				for (int j = 0; j < 128; j++)
 				{
-					if (Collision(&enemies[i]->obj, &bullets[j]->obj))
+					if (bullets[j])
 					{
-						enemies[i]->hp -= 10;
-						HitEffect(bullets[j]->obj.TransInfo.Position.x - 3, bullets[j]->obj.TransInfo.Position.y);
-						
-						delete bullets[j];
-						bullets[j] = nullptr;
+						if (Collision(&enemies[i]->obj, &bullets[j]->obj))
+						{
+							enemies[i]->hp -= 10;
+							HitEffect(bullets[j]->obj.TransInfo.Position.x - 3, bullets[j]->obj.TransInfo.Position.y);
+
+							delete bullets[j];
+							bullets[j] = nullptr;
+						}
 					}
 				}
 			}
 		}
-	}
+	
+
 }
 
 void HitEffect(int _x,int _y)
@@ -703,6 +760,10 @@ void Enemydied()
 		{
 			if (enemies[i]->hp <= 0)
 			{
+				if (enemies[i]->obj.Info.Option == 3)
+				{
+					
+				}
 				delete enemies[i];
 				enemies[i] = nullptr;
 				Score += 50;
@@ -823,12 +884,9 @@ Event* Initi_Even(int _max)
 void Stage_ONE()
 {
 	GameTime += 0.08;
-	// 계산 하는 부분
+
 	if (WallCreatTimer == 0)
 		WallCreatTimer = GetTickCount();
-
-	//ScreenPosition.x += 1;
-	//player.obj.TransInfo.Position.x += 1;
 
 	for (int i = 0; i < 128; i++) //총알 이동
 	{
@@ -971,7 +1029,19 @@ void Stage_ONE()
 		}
 	}
 
-	if (WallCreatTimer + 2000 < GetTickCount())
+	if (Moon) //구름 이동
+	{
+		if (Moon->TransInfo.Position.x + Moon->TransInfo.Scale.x < 0)
+		{
+			delete Moon; Moon = nullptr;
+		}
+		else
+		{
+			move(Moon,Vector2(-1,0));
+		}
+	}
+
+	if (WallCreatTimer + 2000 < GetTickCount()) // 땅 생성
 	{
 		WallCreatTimer = GetTickCount();
 		for (size_t i = 0; i < 16; i++)
@@ -979,12 +1049,20 @@ void Stage_ONE()
 			if (Walls[i] == nullptr)
 			{
 				srand(GetTickCount() * GetTickCount());
-				Walls[i] = CreateWall(Wall[rand()%2+1], 180, 26);
+				Walls[i] = CreateWall(Wall[rand()%2+1], 154, 26);
 				break;
 			}
 		}
 	}
 
+	if (Moon == nullptr)  // 구름 생성
+	{
+		srand(GetTickCount()* GetTickCount());
+		int y= rand() % 20 + 2;
+		Moon = CreateWall(Wall[3], 152, y);
+	}
+
+	
 	EnemyHit();
 	Enemydied();
 
@@ -998,12 +1076,12 @@ void Stage_ONE()
 		appearItem = CreateItem(ItemData[0], 160, 15);
 	}
 
-	if (GameTime > 5)
+	/*if (GameTime > 5)
 	{
 		if (Even[0] == nullptr)
 			Even[0] = new Event(5);
 		if(Even[0]->use == false)
-		EventAppearEnemy(Even[0],2,0,1,5);
+		EventAppearEnemy(Even[0], 1, 0, 1, 4);
 	}
 	if(GameTime > 15)
 	{
@@ -1024,13 +1102,43 @@ void Stage_ONE()
 		if (Even[3] == nullptr)
 			Even[3] = new Event(6);
 		if (Even[3]->use == false)
-			EventAppearEnemy(Even[3], 0.5, 0, 1,4);
+			EventAppearEnemy(Even[3], 1, 0, 1,4);
 	}
 
 	if (GameTime > 55)
 	{
-		//AppearEnemy(EnemyData[2]);
+		if (Even[4] == nullptr)
+			Even[4] = new Event(3);
+		if (Even[4]->use == false)
+			EventAppearEnemy(Even[4], 1, 1, 1, 4);
+	}*/
+
+	if (GameTime > 5)
+	{
+		if (Boss == nullptr)
+		{
+			for (size_t i = 0; i < 32; i++)
+			{
+				if (enemies[i] == nullptr)
+				{
+					enemies[i] = CreateEnemy(EnemyData[3], 152, 12);
+					Boss = enemies[i];
+					break;
+				}
+			}
+		}
 	}
+
+	if (Boss)
+	{
+		if (Boss->obj.TransInfo.Position.x + Boss->obj.TransInfo.Scale.x < 147)
+		{
+			Boss->obj.TransInfo.Rotation.x = 0;
+			Boss->obj.TransInfo.Rotation.y = 0;
+
+		}
+	}
+
 	
 	for (int i = 0; i < 32; i++)
 	{
@@ -1080,6 +1188,11 @@ void Stage_ONE()
 		OnDrawText(Walls[i]);
 	}
 
+	if (Moon)
+	{
+		OnDrawText(Moon);
+	}
+
 	OnDrawText(&player.obj);
 
 	for (int i = 0; i < 128; i++)
@@ -1120,11 +1233,11 @@ void Stage_ONE()
 	}
 
 	
+	
 	//**********      UI 부분
 	SetTextColor(15); SetCursorPosition(maxWidth/2 - strlen("Score:"), 2); cout << "Score:" << Score;
-	SetTextColor(15); SetCursorPosition(5, 28); cout << "LIFE:"; for (size_t i = 0; i < player.chance; i++) { cout << " ★"; }
+	SetTextColor(15); SetCursorPosition(5, 29); cout << "LIFE:"; for (size_t i = 0; i < player.chance; i++) { cout << " ★"; }
 
-	
 
 }
 
@@ -1141,15 +1254,11 @@ Object* CreateWall(const Object* src,int posiX, int posiY)
 	temp->TransInfo.Position.x = posiX;
 	temp->TransInfo.Position.y = posiY;
 	temp->Info.Color = src->Info.Color;
-	temp->Speed = 2;
+	temp->Speed = src->Speed;
 
 	return temp;
 }
 
-void wallBuitl()
-{
-
-}
 
 
 

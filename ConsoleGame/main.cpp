@@ -41,7 +41,7 @@ int main(void)
 	EnemyData[0]->obj.Speed = 2;
 	EnemyData[0]->obj.Info.Color = 8;
 	EnemyData[0]->obj.Info.Texture[0] = (char*)"¡Û¡à¢º";
-	EnemyData[0]->obj.Info.Texture[1] = (char*)" ¡å¢º ";
+	EnemyData[0]->obj.Info.Texture[1] = (char*)"¡Û¡à¢º";
 	EnemyData[0]->obj.TransInfo.Scale.x = strlen("¡Û¡à¢º");
 	EnemyData[0]->obj.TransInfo.Scale.y = 2;
 	EnemyData[0]->obj.TransInfo.Rotation.x = -1;
@@ -85,10 +85,29 @@ int main(void)
 	EnemyData[2]->count = 3;
 	EnemyData[2]->lateTime = 2;
 
+	EnemyData[3] = new Enemy;
+	EnemyData[3]->delay = 200;
+	EnemyData[3]->hp = 5000;
+	EnemyData[3]->obj.Speed = 2;
+	EnemyData[3]->obj.Info.Color = 7;
+	EnemyData[3]->obj.Info.Texture[0] = (char*)"                ¢Ç¢Ç¢Ç¢Ç¢Á";
+	EnemyData[3]->obj.Info.Texture[1] = (char*)"£¼¢Ç¢Ç¢Ç¡×¢Ç¢Ç¢Ç¢Ç¢Ç¢Ç¢Ç¢Á";
+	EnemyData[3]->obj.Info.Texture[2] = (char*)"£¼¢Ç¢Ç¢Ç¡×¢Ç¢Ç¢Ç¢Ç¢Ç¢Ç¢Ç¢Á";
+	EnemyData[3]->obj.Info.Texture[3] = (char*)"£¼¢Ç¢Ç¢Ç¡×¢Ç¢Ç¢Ç¢Ç¢Ç¢Ç¢Ç¢Á";
+	EnemyData[3]->obj.Info.Texture[4] = (char*)"                ¢Ç¢Ç¢Ç¢Ç¢Á";
+	EnemyData[3]->obj.TransInfo.Scale.x = strlen("£¼¢Ç¢Ç¢Ç¡×¢Ç¢Ç¢Ç¢Ç¢Ç¢Ç¢Ç¢Á");
+	EnemyData[3]->obj.TransInfo.Scale.y = 5;
+	EnemyData[3]->obj.TransInfo.Rotation.x = -1;
+	EnemyData[3]->obj.TransInfo.Rotation.y = 0;
+	EnemyData[3]->timer = 0;
+	EnemyData[3]->obj.Info.Option = 3;
+	EnemyData[3]->count = 30;
+	EnemyData[3]->lateTime = 2;
+
 	BulletData[0] = new Bullet;
 	BulletData[0]->obj.Info.Color = 3;
 	BulletData[0]->obj.Info.Texture[0] = (char*)"-";
-	BulletData[0]->obj.Speed = 3;
+	BulletData[0]->obj.Speed = 4;
 	BulletData[0]->obj.TransInfo.Scale.x = strlen("-");
 	BulletData[0]->obj.TransInfo.Scale.y = 1;
 	BulletData[0]->obj.TransInfo.Rotation.x = 1;
@@ -173,7 +192,7 @@ int main(void)
 	ItemData[2]->Info.Texture[0] = (char*)"¡á¡á¡á";
 	ItemData[2]->Info.Texture[1] = (char*)"¡á£Â¡á";
 	ItemData[2]->Info.Texture[2] = (char*)"¡á¡á¡á";
-	ItemData[2]->Speed = 1;
+	ItemData[2]->Speed = 2;
 	ItemData[2]->TransInfo.Scale.x = strlen("¡á¡á¡á");
 	ItemData[2]->TransInfo.Scale.y = 3;
 	ItemData[2]->TransInfo.Rotation.x = 0;
@@ -196,7 +215,7 @@ int main(void)
 	//Wall[0]->Info.Texture[1] = (char*)"  ¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à";
 	//Wall[0]->Info.Texture[2] = (char*)"¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à";
 
-	//Wall[0]->Speed = 0;
+	//Wall[0]->Speed = 2;
 	//Wall[0]->TransInfo.Rotation.x = -1;           Wall[0]->TransInfo.Rotation.y = 0;
 	//Wall[0]->TransInfo.Scale.x = strlen("¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à");  Wall [0]->TransInfo.Scale.y = 3;
 	//Wall[0]->TransInfo.Position.x = 0;            Wall [0]->TransInfo.Position.y =0;
@@ -204,12 +223,12 @@ int main(void)
 	//Wall[0]->Info.Color = 15;
 
 	Wall[1] = new Object;
-	Wall[1]->Info.Texture[0] = (char*)"    ¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à     ";
-	Wall[1]->Info.Texture[1] = (char*)"  ¡à¡à¡à¡à¡à¡à¡à  ¡à¡à¡à¡à¡à¡à¡à  ";
-	Wall[1]->Info.Texture[2] = (char*)"¡à¡à¡à¡à¡à¡à¡à      ¡à¡à¡à¡à¡à¡à¡à";
-	Wall[1]->Speed = 0;
+	Wall[1]->Info.Texture[0] = (char*)"¡¡¡¡¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡¡¡¡¡¡¡¡";
+	Wall[1]->Info.Texture[1] = (char*)"¡¡¡à¡à¡à¡à¡à¡à¡à¡¡¡à¡à¡à¡à¡à¡à¡à¡¡";
+	Wall[1]->Info.Texture[2] = (char*)"¡à¡à¡à¡à¡à¡à¡à¡¡¡¡¡¡¡à¡à¡à¡à¡à¡à¡à";
+	Wall[1]->Speed = 2;
 	Wall[1]->TransInfo.Rotation.x = -1;           Wall[1]->TransInfo.Rotation.y = 0;
-	Wall[1]->TransInfo.Scale.x = strlen("¡à¡à¡à¡à¡à¡à¡à      ¡à¡à¡à¡à¡à¡à¡à");  Wall[1]->TransInfo.Scale.y = 3;
+	Wall[1]->TransInfo.Scale.x = strlen("¡à¡à¡à¡à¡à¡à¡à¡¡¡¡¡¡¡à¡à¡à¡à¡à¡à¡à");  Wall[1]->TransInfo.Scale.y = 3;
 	Wall[1]->TransInfo.Position.x = 180;            Wall[1]->TransInfo.Position.y = 27;
 	Wall[1]->Info.Option = 1;
 	Wall[1]->Info.Color = 15;
@@ -218,13 +237,23 @@ int main(void)
 	Wall[2]->Info.Texture[0] = (char*)"¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à";
 	Wall[2]->Info.Texture[1] = (char*)"¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à";
 	Wall[2]->Info.Texture[2] = (char*)"¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à";
-	Wall[2]->Speed = 0;
+	Wall[2]->Speed = 2;
 	Wall[2]->TransInfo.Rotation.x = -1;           Wall[2]->TransInfo.Rotation.y = 0;
 	Wall[2]->TransInfo.Scale.x = strlen("¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à¡à");  Wall[2]->TransInfo.Scale.y = 3;
 	Wall[2]->TransInfo.Position.x = 180;            Wall[2]->TransInfo.Position.y = 28;
 	Wall[2]->Info.Option = 2;
 	Wall[2]->Info.Color = 15;
 
+	Wall[3] = new Object;
+	Wall[3]->Info.Texture[0] = (char*)" ______  ";
+	Wall[3]->Info.Texture[1] = (char*)"(       )";
+	Wall[3]->Info.Texture[2] = (char*)"--(____) ";
+	Wall[3]->Speed = 1;
+	Wall[3]->TransInfo.Rotation.x = -1;   Wall[3]->TransInfo.Rotation.y = 0;
+	Wall[3]->TransInfo.Scale.x = strlen(" ______  "); Wall[3]->TransInfo.Scale.y = 3;
+	Wall[2]->Info.Option = 3;
+	Wall[3]->Info.Color = 15;
+	
 	
 	for (int i = 0; i < 128; i++) //ºÒ·¿ ÃÊ±âÈ­
 	{
@@ -266,11 +295,6 @@ int main(void)
 			SceneManaer();
 		}
 	}
-	
-	
-
-	
-	
 	return 0;
 }
 
