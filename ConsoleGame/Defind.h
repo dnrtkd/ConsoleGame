@@ -30,6 +30,12 @@ static long delayTime = 0;
 static long enemyResporn = 0;
 static long itemTimer = 0;
 
+static long TitleTimer = 0; //타이틀 씬에서 쓰이는 타이머
+
+static long titleTimer = 0;
+
+static int ClearUi_Score = 0;
+
 static double GameTime = 0;
 
 static int Life = 3;
@@ -46,6 +52,8 @@ static Object* Walls[16] = { nullptr };
 static long WallCreatTimer = 0;
 
 static Object* Moon = nullptr;
+
+static LargeText* pressStart = nullptr;
 
 
 
@@ -273,7 +281,7 @@ void OnDrawText(const Object* obj)
 	}
 }
 
-
+void ClearUi(int _x, int _y);
 
 void HideCursor(const bool _Visible)
 {
@@ -762,11 +770,14 @@ void Enemydied()
 			{
 				if (enemies[i]->obj.Info.Option == 3)
 				{
-					
+					ClearUi(69,12);
 				}
-				delete enemies[i];
-				enemies[i] = nullptr;
-				Score += 50;
+				else
+				{
+					delete enemies[i];
+					enemies[i] = nullptr;
+					Score += 50;
+				}
 			}
 		}
 	}
@@ -807,6 +818,11 @@ void SceneManaer()
 
 void TitleScene()
 {
+	if (titleTimer == 0)
+	{
+		titleTimer = GetTickCount();
+	}
+
 	int Width = (150 / 2) - (strlen("     ,--. ,-----.  ,---.  ,--. ,--.,--.  ,--.      ,------. ,------.  ,----.    ") / 2);
 	int Height = 10;
 
@@ -816,9 +832,34 @@ void TitleScene()
 	SetPosition(Width, Height + 4, (char*)"|  '-'  /'  '-'  '.-'    |'  '-'  '|  | `   |,----.|  |\  \ |  | --' '  '--'  | ", 4);
 	SetPosition(Width, Height + 5, (char*)" `-----'  `-----' `-----'  `-----' `--'  `--''----'`--' '--'`--'      `------'  ", 5);
 
-	Sleep(3000);
+	SetCursorPosition((150 / 2) - (strlen("PRESS THE START!") / 2), Height + 7);
 
-	SceneState++;
+	if (titleTimer + 3000 > GetTickCount()) return;
+
+	if (pressStart == nullptr) //pressStart 초기화
+	{
+		pressStart = new LargeText;
+		pressStart->texture[0] = (char*)"PRESS THE ENTER!";
+		pressStart->lateTimer = GetTickCount();
+		pressStart->timer = GetTickCount();
+		pressStart->color = 15;
+	}
+
+	if (pressStart->timer + 300 > GetTickCount())
+	{
+		SetTextColor(15);
+		SetCursorPosition((150 / 2) - (strlen(pressStart->texture[0]) / 2), Height + 7);
+		cout << pressStart->texture[0];
+	}
+	else if (pressStart->timer + 600 < GetTickCount())
+	{
+		pressStart->timer = GetTickCount();
+	}
+
+	if(GetAsyncKeyState(13))
+		SceneState++;
+
+	
 }
 
 void move(Object* obj,Vector2 direction)
@@ -1066,6 +1107,18 @@ void Stage_ONE()
 	EnemyHit();
 	Enemydied();
 
+	for (size_t i = 0; i < 128; i++)
+	{
+		if (eBullets[i])
+			if (Collision(&player.obj, &eBullets[i]->obj))
+			{
+				if (player.chance >= 0)
+					player.chance--;
+				else
+					SceneState++;
+			}		
+	}
+
 	if (itemTimer == 0)
 		itemTimer = GetTickCount();
 
@@ -1138,6 +1191,8 @@ void Stage_ONE()
 
 		}
 	}
+
+	
 
 	
 	for (int i = 0; i < 32; i++)
@@ -1307,4 +1362,37 @@ void EventUi(LargeText* text,int delay,int _x, int _y,bool* _switch)
 			cout << temp;
 		}
 	}
+}
+
+void ClearUi(int _x, int _y)
+{
+	int heightSize = 5;
+
+	if (ClearUi_Score != Score)
+		ClearUi_Score++;
+	else if (GameTime > 0)
+	{
+		ClearUi_Score -= 50;
+		GameTime -= 1;
+	}
+		
+	for (size_t i = 0; i < heightSize; i++)
+	{
+		SetCursorPosition(_x, _y+i);  cout << "                                  ";
+	}
+
+	for (size_t i = 0; i < heightSize; i++)
+	{
+		SetCursorPosition(_x, _y + i);
+		if (i == 0 || i == heightSize-1)
+			cout << "-------------------------------";
+
+		else
+			cout << "|                             |";
+	}
+	
+	SetCursorPosition(_x + 3, _y+1); cout <<"점수     : " << ClearUi_Score;
+
+	SetCursorPosition(_x + 3, _y + 3); cout << "게임시간 : " << int(GameTime);
+	
 }

@@ -87,7 +87,7 @@ int main(void)
 
 	EnemyData[3] = new Enemy;
 	EnemyData[3]->delay = 200;
-	EnemyData[3]->hp = 5000;
+	EnemyData[3]->hp = 50;
 	EnemyData[3]->obj.Speed = 2;
 	EnemyData[3]->obj.Info.Color = 7;
 	EnemyData[3]->obj.Info.Texture[0] = (char*)"                ¢Ç¢Ç¢Ç¢Ç¢Á";
@@ -253,6 +253,8 @@ int main(void)
 	Wall[3]->TransInfo.Scale.x = strlen(" ______  "); Wall[3]->TransInfo.Scale.y = 3;
 	Wall[2]->Info.Option = 3;
 	Wall[3]->Info.Color = 15;
+
+
 	
 	
 	for (int i = 0; i < 128; i++) //ºÒ·¿ ÃÊ±âÈ­
