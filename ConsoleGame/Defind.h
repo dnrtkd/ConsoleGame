@@ -32,6 +32,9 @@ static long itemTimer = 0;
 
 static long TitleTimer = 0; //타이틀 씬에서 쓰이는 타이머
 
+//가이드씬 전역변수
+static double GuideCountDown = 0; //가이드씬에서 카운트다운
+
 static long titleTimer = 0;
 
 static int ClearUi_Score = 0;
@@ -55,7 +58,10 @@ static Object* Moon = nullptr;
 
 static LargeText* pressStart = nullptr;
 
+static LargeText* upSign = nullptr;
 
+static bool BossDead = false;
+static long BossDeadTimer = 0;
 
 // ** 초기화 함수 (디폴트 매개변수 : int _Value = 0)
 void Initialize(Object* _Object, char* _Texture, int _PosX = 0, int _PosY = 0);
@@ -110,6 +116,8 @@ void Enemydied();
 
 void HitEffect(int _x, int _Y);
 
+void GuidScene();
+
 float GetDistance(const Object* _ObjectA, const Object* _ObjectB);
 
 Effect* createEffect(Effect* src, float _x, float _y);
@@ -132,6 +140,8 @@ Event* Initi_Even(int _count);
 void EventUi(LargeText* text, int delay, int _x, int _y, bool* _switch);
 
 Object* CreateWall(const Object* src, int posiX, int posiY);
+
+void BossDethEffect(Object* obj);
 // ** 함수 정의부
 Item* CreateItem(Item* src,int x, int y)
 {
@@ -152,6 +162,7 @@ Item* CreateItem(Item* src,int x, int y)
 	item->Info.Option = src->Info.Option;
 	return item;
 }
+
 
 void SetPosition(int _x, int _y, char* _str, int _Color)
 {
@@ -683,14 +694,7 @@ void EnemyShoot(Enemy* enemy)
 				}
 			}
 
-			if (enemy->count % 10 == 0)
-			{
-				if (enemy->obj.TransInfo.Rotation.y == 0)
-					enemy->obj.TransInfo.Rotation.y == 1;
 
-				enemy->obj.TransInfo.Rotation.y *= -1;
-
-			}
 				
 		}
 
@@ -770,7 +774,7 @@ void Enemydied()
 			{
 				if (enemies[i]->obj.Info.Option == 3)
 				{
-					ClearUi(69,12);
+					BossDead = true;
 				}
 				else
 				{
@@ -806,6 +810,9 @@ void SceneManaer()
 	case Scene::Title:
 		TitleScene();
 		break;
+	case Scene::guide:
+		GuidScene();
+		break;
 	case Scene::Stage1:
 		Stage_ONE();
 		break;
@@ -823,14 +830,17 @@ void TitleScene()
 		titleTimer = GetTickCount();
 	}
 
-	int Width = (150 / 2) - (strlen("     ,--. ,-----.  ,---.  ,--. ,--.,--.  ,--.      ,------. ,------.  ,----.    ") / 2);
+	int Width = (150 / 2) - (strlen("  _____ ____   ____    __    ___       _____ __ __  ____  ____  ") / 2);
 	int Height = 10;
 
-	SetPosition(Width, Height + 1, (char*)"     ,--. ,-----.  ,---.  ,--. ,--.,--.  ,--.      ,------. ,------.  ,----.    ", 1);
-	SetPosition(Width, Height + 2, (char*)"     |  |'  .-.  ''   .-' |  | |  ||  ,'.|  |      |  .--. '|  .--. ''  .-./    ", 2);
-	SetPosition(Width, Height + 3, (char*)",--. |  ||  | |  |`.  `-. |  | |  ||  |' '  |      |  '--'.'|  '--' ||  | .---. ", 3);
-	SetPosition(Width, Height + 4, (char*)"|  '-'  /'  '-'  '.-'    |'  '-'  '|  | `   |,----.|  |\  \ |  | --' '  '--'  | ", 4);
-	SetPosition(Width, Height + 5, (char*)" `-----'  `-----' `-----'  `-----' `--'  `--''----'`--' '--'`--'      `------'  ", 5);
+	SetPosition(Width, Height + 1, (char*)"  _____ ____   ____    __    ___       _____ __ __  ____  ____  ", 5);
+	SetPosition(Width, Height + 2, (char*)" / ___/|    \ /    |  /  ]  /  _]     / ___/|  |  ||    ||    \ ", 1);
+	SetPosition(Width, Height + 3, (char*)"(   \_ |  o  )  o  | /  /  /  [_     (   \_ |  |  | |  | |  o  )", 2);
+	SetPosition(Width, Height + 4, (char*)" \__  ||   _/|     |/  /  |    _]     \__  ||  _  | |  | |   _/ ", 3);
+	SetPosition(Width, Height + 5, (char*)" /  \ ||  |  |  _  /   \_ |   [_      /  \ ||  |  | |  | |  |   ", 4);
+	SetPosition(Width, Height + 6, (char*)" \    ||  |  |  |  \     ||     |     \    ||  |  | |  | |  |   ", 5);
+	SetPosition(Width, Height + 7, (char*)"  \___||__|  |__|__|\____||_____|      \___||__|__||____||__|   ", 5);
+	
 
 	SetCursorPosition((150 / 2) - (strlen("PRESS THE START!") / 2), Height + 7);
 
@@ -840,7 +850,6 @@ void TitleScene()
 	{
 		pressStart = new LargeText;
 		pressStart->texture[0] = (char*)"PRESS THE ENTER!";
-		pressStart->lateTimer = GetTickCount();
 		pressStart->timer = GetTickCount();
 		pressStart->color = 15;
 	}
@@ -848,7 +857,7 @@ void TitleScene()
 	if (pressStart->timer + 300 > GetTickCount())
 	{
 		SetTextColor(15);
-		SetCursorPosition((150 / 2) - (strlen(pressStart->texture[0]) / 2), Height + 7);
+		SetCursorPosition((150 / 2) - (strlen(pressStart->texture[0]) / 2), Height + 9);
 		cout << pressStart->texture[0];
 	}
 	else if (pressStart->timer + 600 < GetTickCount())
@@ -1129,7 +1138,7 @@ void Stage_ONE()
 		appearItem = CreateItem(ItemData[0], 160, 15);
 	}
 
-	/*if (GameTime > 5)
+	if (GameTime > 5)
 	{
 		if (Even[0] == nullptr)
 			Even[0] = new Event(5);
@@ -1164,9 +1173,9 @@ void Stage_ONE()
 			Even[4] = new Event(3);
 		if (Even[4]->use == false)
 			EventAppearEnemy(Even[4], 1, 1, 1, 4);
-	}*/
+	}
 
-	if (GameTime > 5)
+	if (GameTime > 70)
 	{
 		if (Boss == nullptr)
 		{
@@ -1182,17 +1191,7 @@ void Stage_ONE()
 		}
 	}
 
-	if (Boss)
-	{
-		if (Boss->obj.TransInfo.Position.x + Boss->obj.TransInfo.Scale.x < 147)
-		{
-			Boss->obj.TransInfo.Rotation.x = 0;
-			Boss->obj.TransInfo.Rotation.y = 0;
 
-		}
-	}
-
-	
 
 	
 	for (int i = 0; i < 32; i++)
@@ -1200,6 +1199,28 @@ void Stage_ONE()
 		if (enemies[i])
 		{
 			EnemyShoot(enemies[i]);
+		}
+	}
+
+	if (BossDead == true)
+	{
+		
+		if (BossDeadTimer == 0)
+			BossDeadTimer = GetTickCount();
+
+		if(BossDeadTimer+1000>GetTickCount())
+		BossDethEffect(&Boss->obj);
+		else
+		{
+			for (size_t i = 0; i < 32; i++)
+			{
+				if (enemies[i])
+				{
+					delete enemies[i];
+					enemies[i] = nullptr;
+				}
+			}
+			ClearUi(60, 15);
 		}
 	}
 
@@ -1236,6 +1257,26 @@ void Stage_ONE()
 
 	if(LevelUpSwitch)
 	EventUi(LevelUp, 3, player.obj.TransInfo.Position.x-5, player.obj.TransInfo.Position.y-6, &LevelUpSwitch);
+
+	if (GameTime > 60 && GameTime<63)
+	{
+		if (upSign == nullptr)
+		{
+			upSign = new LargeText;
+			upSign->texture[0] = (char*)"↓ Down!!";
+			upSign->timer = GetTickCount();
+			upSign->color = 15;
+			upSign->count = 0;
+		}
+
+		if (upSign->timer + 300 > GetTickCount())
+		{
+			SetCursorPosition(110, 22); cout << upSign->texture[0] << endl;
+		}
+		else if (upSign->timer + 600 < GetTickCount())
+			upSign->timer = GetTickCount();
+
+	}
 
 	for (size_t i = 0; i < 16; i++)
 	{
@@ -1386,13 +1427,69 @@ void ClearUi(int _x, int _y)
 		SetCursorPosition(_x, _y + i);
 		if (i == 0 || i == heightSize-1)
 			cout << "-------------------------------";
-
-		else
-			cout << "|                             |";
 	}
 	
 	SetCursorPosition(_x + 3, _y+1); cout <<"점수     : " << ClearUi_Score;
 
 	SetCursorPosition(_x + 3, _y + 3); cout << "게임시간 : " << int(GameTime);
 	
+}
+
+void GuidScene()
+{
+	if (GuideCountDown == 0)
+		GuideCountDown = 8;
+
+	GuideCountDown -= 0.08;
+
+	if (GuideCountDown < 0)
+		GuideCountDown = 0;
+
+	OnDrawText(&player.obj);
+
+	UpdateInput();
+
+	for (size_t i = 0; i < 8; i++)
+	{
+		SetCursorPosition(110, 12 + i);
+		if (i == 0 || i == 7)
+			cout << "--------------------------------";
+	}
+
+	for (size_t i = 0; i < 5; i++)
+	{
+		SetCursorPosition(50, 12 + i);
+		if (i == 0 || i == 4)
+			cout << "------------------------------------------------";
+	}
+
+	SetCursorPosition(52, 13); cout << "비행기를 조종해서 적을 물리치세요!";
+	SetCursorPosition(52, 15); cout << "레벨업 아이템으로 비행기를 더 강하게 만드세요";
+
+	SetCursorPosition(110, 13); cout << " 오른 쪽 이동 : →" ;
+	SetCursorPosition(110, 14); cout << " 왼 쪽 이동 : ←";
+	SetCursorPosition(110, 15); cout << " 위 쪽 이동 : ↑";
+	SetCursorPosition(110, 16); cout << " 아래 쪽 이동 : ↓";
+
+	SetCursorPosition(110, 18); cout << " 공격 : SPACE BAR";
+
+	SetCursorPosition(50, 5); cout << (int)GuideCountDown << "초 후 스테이지 시작";
+	
+	if (GuideCountDown==0)
+		SceneState++;
+}
+
+void BossDethEffect(Object* obj)
+{
+	int _x = rand() % (int)obj->TransInfo.Scale.x + (int)obj->TransInfo.Position.x;
+	int _y= rand() %(int)obj->TransInfo.Scale.y + (int)obj->TransInfo.Position.y;
+
+	for (size_t i = 0; i < 32; i++)
+	{
+		if (hitEffect[i] == nullptr)
+		{
+			hitEffect[i] = createEffect(EffectData[1], _x, _y);
+			break;
+		}
+	}
 }

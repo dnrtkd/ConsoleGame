@@ -77,10 +77,10 @@ struct DrawTextInfo
 enum Scene
 {
 	Title = 0,
-	//advice=1,
-	Stage1 = 1,
-	Stage2= 2,
-	GameClear = 3
+	guide=1,
+	Stage1 = 2,
+	Stage2= 3,
+	GameClear = 4
 };
 
 
@@ -97,7 +97,7 @@ struct LargeText
 	char* texture[5];
 	long timer; // 텍스트가 사라질 시간을 카운트
 
-	long lateTimer;
+	long count;
 	int color;
 };
 

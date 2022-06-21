@@ -155,7 +155,7 @@ int main(void)
 	EffectData[0]->obj.Info.Option = 0;
 
 	EffectData[1] = new Effect;
-	EffectData[1]->obj.Info.Color = 12;
+	EffectData[1]->obj.Info.Color = 11;
 	EffectData[1]->obj.Info.Texture[0] = (char*)"¡Ù";
 	EffectData[1]->obj.Speed = 1;
 	EffectData[1]->obj.TransInfo.Scale.x = strlen("¡Ù");
@@ -165,12 +165,10 @@ int main(void)
 
 	ItemData[0] = new Item;
 	ItemData[0]->Info.Color = 4;
-	ItemData[0]->Info.Texture[0] = (char*)"¡á¡á¡á";
-	ItemData[0]->Info.Texture[1] = (char*)"¡á£Ì¡á";
-	ItemData[0]->Info.Texture[2] = (char*)"¡á¡á¡á";
+	ItemData[0]->Info.Texture[0] = (char*)"[£Ì]";
 	ItemData[0]->Speed = 1;
 	ItemData[0]->TransInfo.Scale.x = strlen("¡á¡á¡á");
-	ItemData[0]->TransInfo.Scale.y =3;
+	ItemData[0]->TransInfo.Scale.y =1;
 	ItemData[0]->TransInfo.Rotation.x = 0;
 	ItemData[0]->TransInfo.Rotation.y = 0;
 	ItemData[0]->Info.Option = 0;
