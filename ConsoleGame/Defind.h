@@ -414,13 +414,17 @@ void UpdateInput()
 	if (GetAsyncKeyState(VK_UP) && player.obj.TransInfo.Position.y > 2)
 	{
 		player.obj.TransInfo.Position.y -= 1;
-		//ScreenPosition.y -= 1;
+		if(GameTime>=60 && GameTime<70)
+			if(player.obj.TransInfo.Position.y-ScreenPosition.y <= 13)
+		     ScreenPosition.y -= 1;
 	}
 	// ** [하] 키를 입력받음.
-	if (GetAsyncKeyState(VK_DOWN) && player.obj.TransInfo.Position.y < 28)
+	if (GetAsyncKeyState(VK_DOWN) && player.obj.TransInfo.Position.y < 60)
 	{
 		player.obj.TransInfo.Position.y += 1;
-		//ScreenPosition.y+=1;
+		if (GameTime >= 60 && GameTime < 70)
+			if (player.obj.TransInfo.Position.y - ScreenPosition.y >= 17)
+		         ScreenPosition.y+=1;
 	}
 
 	// ** [좌] 키를 입력받음.
@@ -1090,20 +1094,24 @@ void Stage_ONE()
 			move(Moon,Vector2(-1,0));
 		}
 	}
-
-	if (WallCreatTimer + 2000 < GetTickCount()) // 땅 생성
+	//땅생성
+	if (GameTime < 57)
 	{
-		WallCreatTimer = GetTickCount();
-		for (size_t i = 0; i < 16; i++)
+		if (WallCreatTimer + 2000 < GetTickCount())
 		{
-			if (Walls[i] == nullptr)
+			WallCreatTimer = GetTickCount();
+			for (size_t i = 0; i < 16; i++)
 			{
-				srand(GetTickCount() * GetTickCount());
-				Walls[i] = CreateWall(Wall[rand()%2+1], 154, 26);
-				break;
+				if (Walls[i] == nullptr)
+				{
+					srand(GetTickCount() * GetTickCount());
+					Walls[i] = CreateWall(Wall[rand() % 2 + 1], 154, 26);
+					break;
+				}
 			}
 		}
 	}
+	
 
 	if (Moon == nullptr)  // 구름 생성
 	{
@@ -1112,21 +1120,30 @@ void Stage_ONE()
 		Moon = CreateWall(Wall[3], 152, y);
 	}
 
-	
+	if (Boss)
+	{
+		if (Boss->obj.TransInfo.Position.x + Boss->obj.TransInfo.Scale.x < 147)
+			Boss->obj.Speed = 0;
+	}
+
 	EnemyHit();
 	Enemydied();
 
-	for (size_t i = 0; i < 128; i++)
-	{
-		if (eBullets[i])
-			if (Collision(&player.obj, &eBullets[i]->obj))
-			{
-				if (player.chance >= 0)
-					player.chance--;
-				else
-					SceneState++;
-			}		
-	}
+	//for (size_t i = 0; i < 128; i++) //적 총알과 충돌체크
+	//{
+	//	if (eBullets[i])
+	//		if (Collision(&player.obj, &eBullets[i]->obj))
+	//		{
+	//			if (player.chance >= 0)
+	//			{
+	//				player.chance--;
+	//				delete eBullets[i];
+	//				eBullets[i] = nullptr;
+	//			}
+	//			else
+	//				SceneState++;
+	//		}		
+	//}
 
 	if (itemTimer == 0)
 		itemTimer = GetTickCount();
@@ -1183,7 +1200,7 @@ void Stage_ONE()
 			{
 				if (enemies[i] == nullptr)
 				{
-					enemies[i] = CreateEnemy(EnemyData[3], 152, 12);
+					enemies[i] = CreateEnemy(EnemyData[3], 152, ScreenPosition.y+15);
 					Boss = enemies[i];
 					break;
 				}
@@ -1438,7 +1455,7 @@ void ClearUi(int _x, int _y)
 void GuidScene()
 {
 	if (GuideCountDown == 0)
-		GuideCountDown = 8;
+		GuideCountDown = 5;
 
 	GuideCountDown -= 0.08;
 

@@ -36,7 +36,7 @@ int main(void)
 	player.obj.TransInfo.Position.y = 20;
 
 	EnemyData[0] = new Enemy;
-	EnemyData[0]->delay = 2000;
+	EnemyData[0]->delay = 5000;
 	EnemyData[0]->hp = 50;
 	EnemyData[0]->obj.Speed = 2;
 	EnemyData[0]->obj.Info.Color = 8;
